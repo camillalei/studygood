@@ -91,7 +91,7 @@
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
 if (!data) location.href = '../index.html';
 
-let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+let progress = JSON.parse(localStorage.getItem('progress_grade4') || '{}');
 
 const allWords = data.units.flatMap(u =>
   u.vocabulary.map(v => ({...v, unitId:u.id, unitTitle:u.title, unitColor:u.color}))
@@ -255,7 +255,7 @@ function showTab(name, el) {
 
 function confirmReset() {
   if (confirm('确定要重置所有学习进度吗？此操作不可撤销。')) {
-    localStorage.removeItem('progress');
+    localStorage.removeItem('progress_grade4');
     localStorage.removeItem('studyDays');
     progress = {};
     renderWrong();
