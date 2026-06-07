@@ -90,6 +90,14 @@
     .result-banner { border-radius:14px; padding:12px 16px; text-align:center; font-size:15px; font-weight:600; margin-bottom:14px; display:none; }
     .result-banner.ok { background:#E5FFE9; color:#2ED573; display:block; }
     .result-banner.bad { background:#FFE5E5; color:#FF4757; display:block; }
+
+    .last-result-card { background:white; border-radius:14px; padding:12px 16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:3px solid #4A90D9; }
+    .lr-header { font-size:12px; font-weight:700; color:#666; margin-bottom:8px; }
+    .lr-date { font-weight:400; color:#aaa; margin-left:4px; }
+    .lr-stats { display:flex; gap:14px; margin-bottom:6px; font-size:14px; font-weight:700; }
+    .lr-right { color:#2ED573; } .lr-wrong { color:#FF4757; } .lr-pct { color:#4A90D9; }
+    .lr-words { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+    .lr-word { background:#FFF0F0; color:#FF4757; padding:3px 10px; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -99,6 +107,7 @@
 </div>
 
 <div class="dict-page">
+  <div id="lastResult" style="display:none"></div>
   <div class="unit-selector" id="unitSelector"></div>
 
   <div class="score-bar">
@@ -165,6 +174,10 @@ let rightCount = 0, wrongCount = 0;
 let selectedUnit = unitParam || 'all';
 let showHint = false;
 let retriedWords = new Set();
+let wrongWordsList = [];
+let isRetrySession = false;
+let retryCardWord = null;
+const RESULT_KEY = 'dict5_lastResult';
 
 function buildUnitSelector() {
   const sel = document.getElementById('unitSelector');
@@ -198,6 +211,7 @@ function loadWords() {
   queue = shuffle([...getWords()]);
   current=0; rightCount=0; wrongCount=0;
   retriedWords = new Set();
+  wrongWordsList = [];
   updateScores();
   nextWord();
 }
@@ -278,6 +292,12 @@ function checkAnswer() {
   const banner = document.getElementById('resultBanner');
   if (correct) {
     rightCount++;
+    if (isRetrySession) {
+      const saved = localStorage.getItem(RESULT_KEY);
+      if (saved) { const r = JSON.parse(saved); r.wrongWords = r.wrongWords.filter(w => w !== retryCardWord); localStorage.setItem(RESULT_KEY, JSON.stringify(r)); }
+      retryCardWord = null;
+      showLastResult();
+    }
     progress[v.word] = (progress[v.word]||0)+1;
     renderBlanks(typed,'correct');
     banner.textContent='✅ 写对了！';
@@ -285,6 +305,7 @@ function checkAnswer() {
     setTimeout(() => { current++; nextWord(); }, 1200);
   } else {
     wrongCount++;
+    wrongWordsList.push(v.word);
     progress[v.word] = (progress[v.word]||0)-1;
     renderBlanks(typed,'wrong');
     if (!retriedWords.has(v.word)) {
@@ -310,7 +331,29 @@ function updateScores() {
 }
 
 function showComplete() {
+  if (isRetrySession) {
+    isRetrySession = false;
+    document.querySelector('.play-area').innerHTML = `
+      <button class="play-btn" id="playBtn" onclick="playWord()">
+        🔊 <span>点击听单词</span>
+      </button>
+      <div class="play-sub">可以点多次，仔细听清楚再写</div>`;
+    document.getElementById('blanksRow').innerHTML='';
+    document.getElementById('hintLetters').innerHTML='';
+    document.getElementById('resultBanner').className='result-banner';
+    document.getElementById('nextBtn').style.display='none';
+    updateScores();
+    return;
+  }
   const pct = Math.round(rightCount/(rightCount+wrongCount||1)*100);
+  const result = {
+    date: new Date().toLocaleDateString('zh-CN'),
+    time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}),
+    unit: selectedUnit, right: rightCount, wrong: wrongCount, pct,
+    wrongWords: [...new Set(wrongWordsList)]
+  };
+  localStorage.setItem(RESULT_KEY, JSON.stringify(result));
+  showLastResult();
   document.querySelector('.play-area').innerHTML = `
     <div style="text-align:center;padding:20px">
       <div style="font-size:52px">${pct>=80?'🌟':pct>=60?'👍':'💪'}</div>
@@ -325,6 +368,38 @@ function showComplete() {
   document.getElementById('nextBtn').onclick=loadWords;
 }
 
+function showLastResult() {
+  const el = document.getElementById('lastResult');
+  const saved = localStorage.getItem(RESULT_KEY);
+  if (!saved) { el.style.display='none'; return; }
+  const r = JSON.parse(saved);
+  const unitLabel = r.unit==='all'?'全部':r.unit==='review'?'复习':`Unit ${r.unit}`;
+  el.style.display = 'block';
+  el.innerHTML = `<div class="last-result-card">
+    <div class="lr-header">📋 上次记录<span class="lr-date">${r.date} ${r.time} · ${unitLabel}</span></div>
+    <div class="lr-stats">
+      <span class="lr-right">✅ ${r.right}</span>
+      <span class="lr-wrong">❌ ${r.wrong}</span>
+      <span class="lr-pct">${r.pct}%</span>
+    </div>
+    ${r.wrongWords.length ? `<div class="lr-words">${r.wrongWords.map(w=>`<span class="lr-word" onclick="retryFromCard('${w}')">${w}</span>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+function retryFromCard(word) {
+  const allWords = [...data.units.flatMap(u=>u.vocabulary), ...data.review.vocabulary];
+  const wordObj = allWords.find(w => w.word === word);
+  if (!wordObj) return;
+  isRetrySession = true;
+  retryCardWord = word;
+  queue = [wordObj];
+  current = 0; rightCount = 0; wrongCount = 0;
+  retriedWords = new Set([word]);
+  wrongWordsList = [];
+  updateScores();
+  nextWord();
+}
+
 document.addEventListener('keydown', e => {
   if (e.key==='Backspace') pressKey('⌫');
   else if (e.key==='Enter' && answered) { current++; nextWord(); }
@@ -336,6 +411,7 @@ document.addEventListener('keydown', e => {
 
 buildUnitSelector();
 loadWords();
+showLastResult();
 </script>
 </body>
 </html>
