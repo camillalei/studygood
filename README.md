@@ -101,16 +101,7 @@ english/
 
 登录页文件：`app/login.html`
 
-打开文件，找到顶部配置区修改账号密码：
-
-```javascript
-const CONFIG = {
-  username: 'admin',   // 改这里
-  password: '123456'   // 改这里
-};
-```
-
-修改后记得重新推送：`git add . && git commit -m "更新密码" && git push`
+打开 `login.html`，找到顶部 `CONFIG` 区修改账号密码（账号密码不同步到 GitHub），修改后重新推送即可。
 
 ---
 
