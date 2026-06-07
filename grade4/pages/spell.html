@@ -148,6 +148,7 @@ let progress = JSON.parse(localStorage.getItem('progress') || '{}');
 let queue = [], current = 0, typed = '', answered = false;
 let rightCount = 0, wrongCount = 0;
 let selectedUnit = unitParam || 'all';
+let retriedWords = new Set();
 
 // 建键盘
 ROWS.forEach((row, i) => {
@@ -199,6 +200,7 @@ function shuffle(arr) {
 function loadWords() {
   queue = shuffle([...getWords()]);
   current = 0; rightCount = 0; wrongCount = 0;
+  retriedWords = new Set();
   updateScores();
   nextWord();
 }
@@ -269,7 +271,13 @@ function checkAnswer() {
     wrongCount++;
     progress[v.word] = (progress[v.word] || 0) - 1;
     renderBlanks(v.word, typed, 'wrong');
-    banner.innerHTML = `❌ 正确答案是：<b>${v.word}</b>`;
+    if (!retriedWords.has(v.word)) {
+      retriedWords.add(v.word);
+      queue.push(v);
+      banner.innerHTML = `❌ 正确答案是：<b>${v.word}</b> <span style="font-size:12px;color:#aaa;font-weight:400">· 稍后重练</span>`;
+    } else {
+      banner.innerHTML = `❌ 正确答案是：<b>${v.word}</b>`;
+    }
     banner.className = 'result-banner wrong-banner';
     speak(v.word);
     document.getElementById('nextBtn').style.display = 'block';

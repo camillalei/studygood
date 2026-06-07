@@ -164,6 +164,7 @@ let queue = [], current = 0, typed = '', answered = false;
 let rightCount = 0, wrongCount = 0;
 let selectedUnit = unitParam || 'all';
 let showHint = false;
+let retriedWords = new Set();
 
 function buildUnitSelector() {
   const sel = document.getElementById('unitSelector');
@@ -196,6 +197,7 @@ function shuffle(arr) {
 function loadWords() {
   queue = shuffle([...getWords()]);
   current=0; rightCount=0; wrongCount=0;
+  retriedWords = new Set();
   updateScores();
   nextWord();
 }
@@ -285,9 +287,14 @@ function checkAnswer() {
     wrongCount++;
     progress[v.word] = (progress[v.word]||0)-1;
     renderBlanks(typed,'wrong');
-    banner.innerHTML=`❌ 正确拼写：<b>${v.word}</b>（${v.chinese}）`;
+    if (!retriedWords.has(v.word)) {
+      retriedWords.add(v.word);
+      queue.push(v);
+      banner.innerHTML=`❌ 正确拼写：<b>${v.word}</b>（${v.chinese}）<span style="font-size:12px;color:#aaa;font-weight:400"> · 稍后重练</span>`;
+    } else {
+      banner.innerHTML=`❌ 正确拼写：<b>${v.word}</b>（${v.chinese}）`;
+    }
     banner.className='result-banner bad';
-    // 再播一遍正确答案
     setTimeout(playWord, 500);
     document.getElementById('nextBtn').style.display='block';
   }
