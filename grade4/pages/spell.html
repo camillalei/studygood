@@ -95,7 +95,7 @@
 </head>
 <body>
 <div class="topbar">
-  <a class="back-btn" href="../grade5.html">‹</a>
+  <a class="back-btn" href="../index.html">‹</a>
   <h1>拼写测试</h1>
 </div>
 
@@ -137,7 +137,7 @@ const ROWS = [
 const params = new URLSearchParams(location.search);
 const unitParam = params.get('unit');
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
-if (!data) location.href = '../grade5.html';
+if (!data) location.href = '../index.html';
 
 let progress = JSON.parse(localStorage.getItem('progress') || '{}');
 let queue = [], current = 0, typed = '', answered = false;

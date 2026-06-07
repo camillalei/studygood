@@ -204,7 +204,7 @@
 </head>
 <body>
 <div class="topbar">
-  <a class="back-btn" href="../grade5.html">‹</a>
+  <a class="back-btn" href="../index.html">‹</a>
   <h1 id="pageTitle">单元词汇</h1>
 </div>
 
@@ -268,12 +268,12 @@ const unitId = params.get('id');
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
 const progress = JSON.parse(localStorage.getItem('progress') || '{}');
 
-if (!data) { location.href = '../grade5.html'; }
+if (!data) { location.href = '../index.html'; }
 
 const unit = unitId === 'review' ? { ...data.review, id: 'review' } :
   data.units.find(u => u.id == unitId);
 
-if (!unit) { location.href = '../grade5.html'; }
+if (!unit) { location.href = '../index.html'; }
 
 document.getElementById('pageTitle').textContent = `Unit ${unit.id === 'review' ? 'R' : unit.id}`;
 document.getElementById('heroTitle').textContent = unit.title;

@@ -3,153 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>五年级英语上册</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <script src="data/content.js"></script>
+  <title>英语学习</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex; flex-direction: column;
+      align-items: center; padding: 0 20px 40px;
+    }
+
+    .portal-header {
+      text-align: center; padding: 56px 0 32px;
+      color: white;
+    }
+    .portal-header .emoji { font-size: 52px; line-height: 1; }
+    .portal-header h1 { font-size: 24px; font-weight: 700; margin-top: 14px; }
+    .portal-header p { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+
+    .grade-list {
+      width: 100%; max-width: 420px; display: flex;
+      flex-direction: column; gap: 16px;
+    }
+
+    .grade-card {
+      border-radius: 24px; padding: 24px 24px 20px;
+      cursor: pointer; border: none; text-align: left;
+      position: relative; overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .grade-card:active { transform: scale(0.97); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+
+    .grade-card.g5 { background: linear-gradient(135deg, #4776E6, #8E54E9); }
+    .grade-card.g4 { background: linear-gradient(135deg, #FF6B6B, #FF9F43); }
+
+    .grade-card .tag {
+      display: inline-block; background: rgba(255,255,255,0.2);
+      color: white; font-size: 11px; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .grade-card h2 { font-size: 22px; font-weight: 800; color: white; }
+    .grade-card .sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+
+    .grade-card .arrow {
+      position: absolute; right: 24px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 28px; color: rgba(255,255,255,0.5);
+      font-weight: 300;
+    }
+
+    .grade-card .deco {
+      position: absolute; right: -20px; bottom: -20px;
+      font-size: 100px; opacity: 0.08; line-height: 1;
+      pointer-events: none;
+    }
+
+    .logout-btn {
+      margin-top: 32px;
+      background: none; border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.4); font-size: 13px;
+      padding: 8px 24px; border-radius: 20px; cursor: pointer;
+    }
+    .logout-btn:active { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body>
   <script>
     if (localStorage.getItem('loggedIn') !== 'true') {
       location.replace('login.html');
     }
   </script>
-</head>
-<body>
 
-<div class="home-header">
-  <h1>五年级英语上册</h1>
-  <p>广州版 · 7个单元 · 共 <span id="totalWords">0</span> 个单词</p>
-</div>
-
-<div class="home-stats">
-  <div class="stat-item">
-    <div class="stat-num" id="learnedCount">0</div>
-    <div class="stat-label">已掌握</div>
+  <div class="portal-header">
+    <div class="emoji">📚</div>
+    <h1>广州版英语</h1>
+    <p>选择年级开始学习</p>
   </div>
-  <div class="stat-item">
-    <div class="stat-num" id="wrongCount">0</div>
-    <div class="stat-label">待复习</div>
+
+  <div class="grade-list">
+    <button class="grade-card g5" onclick="location.href='grade5.html'">
+      <div class="tag">在读年级</div>
+      <h2>五年级上册</h2>
+      <div class="sub">7个单元 · 广州版 2025秋</div>
+      <div class="arrow">›</div>
+      <div class="deco">5</div>
+    </button>
+
+    <button class="grade-card g4" onclick="location.href='grade4/index.html'">
+      <div class="tag">已学年级</div>
+      <h2>四年级下册</h2>
+      <div class="sub">8个单元 · 广州版</div>
+      <div class="arrow">›</div>
+      <div class="deco">4</div>
+    </button>
   </div>
-  <div class="stat-item">
-    <div class="stat-num" id="streakCount">0</div>
-    <div class="stat-label">连续天数</div>
-  </div>
-</div>
 
-<div class="section-title">学习模式</div>
-<div class="mode-grid">
-  <button class="mode-card" onclick="location.href='pages/flashcard.html'">
-    <div class="icon">🃏</div>
-    <div class="name">单词闪卡</div>
-    <div class="desc">翻转记忆</div>
-  </button>
-  <button class="mode-card" onclick="location.href='pages/spell.html'">
-    <div class="icon">✏️</div>
-    <div class="name">拼写测试</div>
-    <div class="desc">看中文写英文</div>
-  </button>
-  <button class="mode-card" onclick="location.href='pages/dictation.html'">
-    <div class="icon">🎧</div>
-    <div class="name">听写练习</div>
-    <div class="desc">听音写单词</div>
-  </button>
-  <button class="mode-card" onclick="location.href='pages/sentences.html'">
-    <div class="icon">💬</div>
-    <div class="name">句型学习</div>
-    <div class="desc">核心句式</div>
-  </button>
-</div>
+  <button class="logout-btn" onclick="logout()">退出登录</button>
 
-<div class="mode-grid" style="padding-top:0">
-  <button class="mode-card" onclick="location.href='pages/review.html'" style="grid-column: 1/-1">
-    <div class="icon">📝</div>
-    <div class="name">错题本</div>
-    <div class="desc">专项复习做错的单词</div>
-  </button>
-</div>
-
-<div class="section-title">选择单元</div>
-<div class="unit-list" id="unitList"></div>
-
-<script>
-let data = null;
-
-async function init() {
-  data = window.ENGLISH_DATA;
-  localStorage.setItem('englishData', JSON.stringify(data));
-
-  const allWords = data.units.flatMap(u => u.vocabulary).concat(data.review.vocabulary);
-  document.getElementById('totalWords').textContent = allWords.length;
-
-  const progress = JSON.parse(localStorage.getItem('progress') || '{}');
-  const learned = Object.values(progress).filter(v => v >= 3).length;
-  const wrong = Object.values(progress).filter(v => v < 0).length;
-
-  document.getElementById('learnedCount').textContent = learned;
-  document.getElementById('wrongCount').textContent = wrong;
-
-  // 连续天数
-  const streak = getStreak();
-  document.getElementById('streakCount').textContent = streak;
-
-  const list = document.getElementById('unitList');
-  data.units.forEach(unit => {
-    const total = unit.vocabulary.length;
-    const done = unit.vocabulary.filter(v => (progress[v.word] || 0) >= 3).length;
-    const pct = total ? Math.round(done / total * 100) : 0;
-
-    const el = document.createElement('button');
-    el.className = 'unit-card';
-    el.onclick = () => location.href = `pages/unit.html?id=${unit.id}`;
-    el.innerHTML = `
-      <div class="unit-badge" style="background:${unit.color}">${unit.id}</div>
-      <div class="unit-info">
-        <div class="title">${unit.title}</div>
-        <div class="sub">${unit.theme} · ${total}个单词</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${unit.color}"></div></div>
-      </div>
-      <div class="unit-arrow">›</div>
-    `;
-    list.appendChild(el);
-  });
-
-  // Review unit
-  const rev = data.review;
-  const total = rev.vocabulary.length;
-  const done = rev.vocabulary.filter(v => (progress[v.word] || 0) >= 3).length;
-  const pct = total ? Math.round(done / total * 100) : 0;
-  const el = document.createElement('button');
-  el.className = 'unit-card';
-  el.onclick = () => location.href = `pages/unit.html?id=review`;
-  el.innerHTML = `
-    <div class="unit-badge" style="background:${rev.color}">R</div>
-    <div class="unit-info">
-      <div class="title">${rev.title}</div>
-      <div class="sub">${rev.theme} · ${total}个单词</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${rev.color}"></div></div>
-    </div>
-    <div class="unit-arrow">›</div>
-  `;
-  list.appendChild(el);
-}
-
-function getStreak() {
-  const today = new Date().toDateString();
-  const days = JSON.parse(localStorage.getItem('studyDays') || '[]');
-  if (!days.includes(today)) {
-    days.push(today);
-    localStorage.setItem('studyDays', JSON.stringify(days));
-  }
-  let streak = 0;
-  let d = new Date();
-  while (true) {
-    if (days.includes(d.toDateString())) {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else break;
-  }
-  return streak;
-}
-
-init();
-</script>
+  <script>
+    function logout() {
+      localStorage.removeItem('loggedIn');
+      location.href = 'login.html';
+    }
+  </script>
 </body>
 </html>

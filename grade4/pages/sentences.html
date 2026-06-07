@@ -80,7 +80,7 @@
 </head>
 <body>
 <div class="topbar">
-  <a class="back-btn" href="../grade5.html">‹</a>
+  <a class="back-btn" href="../index.html">‹</a>
   <h1>句型学习</h1>
 </div>
 
@@ -100,7 +100,7 @@
 const params = new URLSearchParams(location.search);
 const unitParam = params.get('unit');
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
-if (!data) location.href = '../grade5.html';
+if (!data) location.href = '../index.html';
 
 let selectedUnit = unitParam || 'all';
 let mode = 'browse';
