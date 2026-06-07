@@ -76,6 +76,7 @@
     .key:active { background:#eee; transform:scale(0.9); }
     .key-del { width:52px; max-width:52px; background:#FF6B6B; color:white; font-size:18px; }
     .key-special { width:44px; max-width:44px; background:#f5f5f5; color:#555; font-size:18px; font-weight:700; }
+    .key-space { width:160px; max-width:160px; background:#f0f0f0; font-size:13px; }
 
     .blanks-row { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
     .blank-letter {
@@ -124,6 +125,7 @@
     <div class="key-row" id="kr1"></div>
     <div class="key-row" id="kr2"></div>
     <div class="key-row" id="kr3"></div>
+    <div class="key-row" id="kr4"></div>
   </div>
 
   <div class="result-banner" id="resultBanner"></div>
@@ -146,6 +148,11 @@ ROWS.forEach((row, i) => {
     rowEl.appendChild(btn);
   });
 });
+const spaceBtn = document.createElement('button');
+spaceBtn.className = 'key key-space';
+spaceBtn.textContent = 'SPACE';
+spaceBtn.onclick = () => pressKey(' ');
+document.getElementById('kr4').appendChild(spaceBtn);
 
 const params = new URLSearchParams(location.search);
 const unitParam = params.get('unit');
@@ -316,6 +323,7 @@ document.addEventListener('keydown', e => {
   else if (e.key==='Enter' && answered) { current++; nextWord(); }
   else if (e.key==='-') pressKey('-');
   else if (e.key==="'") pressKey("'");
+  else if (e.key===' ') { e.preventDefault(); pressKey(' '); }
   else if (/^[a-zA-Z]$/.test(e.key)) pressKey(e.key.toLowerCase());
 });
 

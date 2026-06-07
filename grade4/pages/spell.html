@@ -313,6 +313,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Enter' && answered) { current++; nextWord(); }
   else if (e.key === '-') pressKey('-');
   else if (e.key === "'") pressKey("'");
+  else if (e.key === ' ') { e.preventDefault(); pressKey(' '); }
   else if (/^[a-zA-Z]$/.test(e.key)) pressKey(e.key.toLowerCase());
 });
 
