@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>句型学习</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../data/content.js"></script>
+  <style>
+    .sent-page { padding: 16px 20px 80px; max-width: 500px; margin: 0 auto; }
+    .unit-selector { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:16px; }
+    .unit-selector::-webkit-scrollbar { display:none; }
+    .unit-pill { flex-shrink:0; padding:7px 16px; border-radius:20px; border:2px solid #eee; background:white; font-size:13px; cursor:pointer; font-weight:600; }
+    .unit-pill.active { border-color:var(--primary); background:var(--primary); color:white; }
+
+    .mode-toggle {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .mode-btn {
+      flex:1; padding:10px; border-radius:12px; border:2px solid #eee;
+      background:white; font-size:14px; font-weight:600; cursor:pointer;
+    }
+    .mode-btn.active { border-color:var(--primary); background:#EEF5FF; color:var(--primary); }
+
+    /* 浏览模式 */
+    .browse-card {
+      background:white; border-radius:16px; padding:20px;
+      box-shadow:var(--shadow); margin-bottom:12px;
+    }
+    .bc-unit-tag {
+      display:inline-block; padding:3px 10px; border-radius:10px;
+      font-size:11px; font-weight:700; color:white; margin-bottom:10px;
+    }
+    .bc-en {
+      font-size:17px; line-height:1.65; margin-bottom:10px;
+      display:flex; justify-content:space-between; align-items:flex-start; gap:8px;
+    }
+    .bc-zh { font-size:14px; color:#888; line-height:1.5; }
+    .tts-btn { background:none; border:none; font-size:20px; cursor:pointer; flex-shrink:0; }
+
+    /* 练习模式 */
+    .practice-card {
+      background:white; border-radius:20px; padding:24px;
+      box-shadow:var(--shadow); margin-bottom:16px;
+    }
+    .pc-q { font-size:15px; color:#888; margin-bottom:12px; }
+    .pc-blanked { font-size:20px; line-height:1.7; margin-bottom:16px; font-weight:500; }
+    .blank-word {
+      display:inline-block; min-width:80px; border-bottom:2px solid var(--primary);
+      color:var(--primary); cursor:pointer; padding:0 4px;
+    }
+    .options-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .option-btn {
+      padding:8px 16px; border-radius:10px; border:2px solid #eee;
+      background:white; font-size:14px; cursor:pointer; transition:all 0.15s;
+    }
+    .option-btn:active { transform:scale(0.96); }
+    .option-btn.selected { border-color:var(--primary); background:#EEF5FF; color:var(--primary); }
+    .option-btn.correct { border-color:#2ED573; background:#E5FFE9; color:#2ED573; }
+    .option-btn.incorrect { border-color:#FF4757; background:#FFE5E5; color:#FF4757; }
+
+    .pc-result { font-size:14px; min-height:22px; margin-bottom:12px; font-weight:600; }
+    .pc-result.ok { color:#2ED573; }
+    .pc-result.bad { color:#FF4757; }
+
+    .nav-btns { display:flex; gap:10px; }
+    .nav-btn { flex:1; height:46px; border-radius:12px; border:none; font-size:15px; font-weight:600; cursor:pointer; }
+    .nav-prev { background:#f0f0f0; color:#555; }
+    .nav-next { background:var(--primary); color:white; }
+
+    .chunks-section { margin-top:24px; }
+    .chunks-title { font-size:13px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+    .chunk-pills { display:flex; flex-wrap:wrap; gap:8px; }
+    .chunk-pill {
+      background:white; border-radius:20px; padding:8px 16px;
+      font-size:14px; box-shadow:var(--shadow); cursor:pointer;
+      display:flex; align-items:center; gap:6px;
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="../index.html">‹</a>
+  <h1>句型学习</h1>
+</div>
+
+<div class="sent-page">
+  <div class="unit-selector" id="unitSelector"></div>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btnBrowse" onclick="setMode('browse')">📖 浏览模式</button>
+    <button class="mode-btn" id="btnPractice" onclick="setMode('practice')">🎯 练习模式</button>
+  </div>
+
+  <div id="browseArea"></div>
+  <div id="practiceArea" style="display:none"></div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const unitParam = params.get('unit');
+const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
+if (!data) location.href = '../index.html';
+
+let selectedUnit = unitParam || 'all';
+let mode = 'browse';
+let practiceList = [], practiceIdx = 0;
+
+function buildUnitSelector() {
+  const sel = document.getElementById('unitSelector');
+  sel.innerHTML = '';
+  [{ label:'全部', id:'all' }, ...data.units.map(u=>({label:`U${u.id}`,id:u.id})), {label:'Rev',id:'review'}]
+    .forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'unit-pill' + (selectedUnit==item.id?' active':'');
+      btn.textContent = item.label;
+      btn.onclick = () => { selectedUnit=item.id; buildUnitSelector(); render(); };
+      sel.appendChild(btn);
+    });
+}
+
+function getUnits() {
+  if (selectedUnit==='all') return data.units;
+  if (selectedUnit==='review') return [];
+  return data.units.filter(u=>u.id==selectedUnit);
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnBrowse').classList.toggle('active', m==='browse');
+  document.getElementById('btnPractice').classList.toggle('active', m==='practice');
+  document.getElementById('browseArea').style.display = m==='browse'?'':'none';
+  document.getElementById('practiceArea').style.display = m==='practice'?'':'none';
+  render();
+}
+
+function render() {
+  if (mode==='browse') renderBrowse();
+  else renderPractice();
+}
+
+function renderBrowse() {
+  const area = document.getElementById('browseArea');
+  area.innerHTML = '';
+  const units = getUnits();
+
+  units.forEach(unit => {
+    const sents = unit.sentences || [];
+    if (!sents.length) return;
+
+    sents.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'browse-card';
+      card.innerHTML = `
+        <div class="bc-unit-tag" style="background:${unit.color}">Unit ${unit.id}</div>
+        <div class="bc-en">
+          <span>${highlight(s.en)}</span>
+          <button class="tts-btn" onclick="speak(\`${s.en.replace(/`/g,"'")}\`)">🔊</button>
+        </div>
+        <div class="bc-zh">${s.zh}</div>
+      `;
+      area.appendChild(card);
+    });
+
+    // Chunk Store
+    const chunks = unit.chunks || [];
+    if (chunks.length) {
+      const sec = document.createElement('div');
+      sec.className = 'chunks-section';
+      sec.innerHTML = `<div class="chunks-title">Unit ${unit.id} 短语积累</div><div class="chunk-pills" id="cp-${unit.id}"></div>`;
+      area.appendChild(sec);
+      const cp = sec.querySelector('.chunk-pills');
+      chunks.forEach(c => {
+        const en = typeof c === 'string' ? c : c.en;
+        const zh = typeof c === 'string' ? '' : c.zh;
+        const pill = document.createElement('div');
+        pill.className = 'chunk-pill';
+        pill.style.cssText = 'flex-direction:column;align-items:flex-start;gap:2px';
+        pill.onclick = () => speak(en);
+        pill.innerHTML = `
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px;font-weight:600">${en}</span>
+            <span style="font-size:14px">🔊</span>
+          </div>
+          ${zh ? `<span style="font-size:12px;color:#888">${zh}</span>` : ''}
+        `;
+        cp.appendChild(pill);
+      });
+    }
+  });
+
+  if (area.innerHTML==='') {
+    area.innerHTML = '<div class="empty-state"><div class="emoji">📝</div><p>该单元暂无句型数据</p></div>';
+  }
+}
+
+function highlight(text) {
+  // 加粗关键词（will / going to / can / you / I）
+  return text.replace(/\b(will|going to|can|What|How|Are|Is|Do|Does|Please|Make sure|If)\b/g,
+    '<strong>$1</strong>');
+}
+
+// 练习模式：翻译填空（看中文选英文句子）
+function renderPractice() {
+  const area = document.getElementById('practiceArea');
+  area.innerHTML = '';
+
+  const units = getUnits();
+  const allSents = units.flatMap(u => (u.sentences||[]).map(s=>({...s,unit:u})));
+  if (allSents.length < 2) {
+    area.innerHTML='<div class="empty-state"><div class="emoji">📝</div><p>需要至少2条句型才能练习</p></div>';
+    return;
+  }
+
+  // 打乱顺序
+  practiceList = shuffle([...allSents]);
+  practiceIdx = 0;
+  showPracticeCard();
+}
+
+function showPracticeCard() {
+  const area = document.getElementById('practiceArea');
+  if (practiceIdx >= practiceList.length) {
+    area.innerHTML = `
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:52px">🎉</div>
+        <div style="font-size:20px;font-weight:700;margin:12px 0">全部练完！</div>
+        <button class="btn-primary" onclick="renderPractice()">再来一遍</button>
+      </div>`;
+    return;
+  }
+
+  const item = practiceList[practiceIdx];
+  // 生成3个错误选项
+  const others = practiceList.filter((_,i)=>i!==practiceIdx).sort(()=>Math.random()-0.5).slice(0,3);
+  const options = shuffle([item, ...others]);
+
+  area.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'practice-card';
+
+  const optionsHtml = options.map((o,i) => `
+    <button class="option-btn" id="opt-${i}" onclick="selectOption(${i}, ${o===item}, \`${item.en.replace(/`/g,"'")}\`, ${options.length})">
+      ${o.en}
+    </button>`).join('');
+
+  card.innerHTML = `
+    <div class="pc-q">选出对应的英文句子：</div>
+    <div class="pc-blanked" style="font-size:22px;font-weight:700;color:var(--primary);margin-bottom:20px">${item.zh}</div>
+    <div class="options-grid">${optionsHtml}</div>
+    <div class="pc-result" id="pcResult"></div>
+    <div class="nav-btns">
+      <button class="nav-btn nav-prev" onclick="skipCard()">跳过</button>
+      <button class="nav-btn nav-next" id="nextCardBtn" style="display:none" onclick="nextCard()">下一句 →</button>
+    </div>
+  `;
+  area.appendChild(card);
+  document.getElementById(`opt-0`) && void 0;
+}
+
+function selectOption(idx, correct, correctText, total) {
+  for (let i=0;i<total;i++) {
+    const btn = document.getElementById(`opt-${i}`);
+    if (btn) btn.disabled = true;
+  }
+  const btn = document.getElementById(`opt-${idx}`);
+  const result = document.getElementById('pcResult');
+  if (correct) {
+    btn.classList.add('correct');
+    result.textContent = '✅ 正确！';
+    result.className = 'pc-result ok';
+    speak(correctText);
+  } else {
+    btn.classList.add('incorrect');
+    result.innerHTML = `❌ 正确答案：<b>${correctText}</b>`;
+    result.className = 'pc-result bad';
+    // 高亮正确选项
+    for (let i=0;i<total;i++) {
+      const b = document.getElementById(`opt-${i}`);
+      if (b && b.textContent.trim()===correctText.trim()) b.classList.add('correct');
+    }
+    speak(correctText);
+  }
+  document.getElementById('nextCardBtn').style.display = '';
+}
+
+function nextCard() { practiceIdx++; showPracticeCard(); }
+function skipCard() { practiceIdx++; showPracticeCard(); }
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+buildUnitSelector();
+render();
+</script>
+</body>
+</html>

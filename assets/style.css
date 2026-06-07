@@ -1,0 +1,464 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #4A90D9;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #333;
+  --subtext: #888;
+  --radius: 16px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== 导航栏 ===== */
+.topbar {
+  background: white;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar .back-btn {
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+.topbar h1 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ===== 主页 ===== */
+.home-header {
+  background: linear-gradient(135deg, #4A90D9, #7B68EE);
+  color: white;
+  padding: 32px 20px 24px;
+  text-align: center;
+}
+.home-header h1 { font-size: 22px; margin-bottom: 6px; }
+.home-header p { font-size: 14px; opacity: 0.85; }
+
+.home-stats {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--subtext);
+  margin-top: 2px;
+}
+
+/* ===== 功能入口 ===== */
+.section-title {
+  padding: 20px 20px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--subtext);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 20px 16px;
+}
+.mode-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+}
+.mode-card:active { transform: scale(0.97); }
+.mode-card .icon { font-size: 32px; margin-bottom: 8px; }
+.mode-card .name { font-size: 15px; font-weight: 600; }
+.mode-card .desc { font-size: 12px; color: var(--subtext); margin-top: 4px; }
+
+/* ===== 单元列表 ===== */
+.unit-list { padding: 0 20px 80px; }
+.unit-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: var(--text);
+  cursor: pointer;
+  border: none;
+  width: 100%;
+}
+.unit-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+.unit-info { flex: 1; text-align: left; }
+.unit-info .title { font-size: 15px; font-weight: 600; }
+.unit-info .sub { font-size: 12px; color: var(--subtext); margin-top: 3px; }
+.unit-arrow { color: #ccc; font-size: 18px; }
+
+/* 进度条 */
+.progress-bar {
+  height: 4px;
+  background: #eee;
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s;
+}
+
+/* ===== 闪卡页 ===== */
+.flashcard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  min-height: calc(100vh - 60px);
+}
+
+.card-counter {
+  font-size: 13px;
+  color: var(--subtext);
+  margin-bottom: 16px;
+}
+
+.flashcard {
+  width: 100%;
+  max-width: 400px;
+  height: 260px;
+  perspective: 1000px;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+.flashcard-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+.flashcard-front {
+  background: white;
+}
+.flashcard-back {
+  background: white;
+  transform: rotateY(180deg);
+}
+.card-word {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.card-phonetic {
+  font-size: 16px;
+  color: var(--subtext);
+  margin-bottom: 16px;
+}
+.card-hint {
+  font-size: 14px;
+  color: #aaa;
+}
+.card-chinese {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+.card-example {
+  font-size: 14px;
+  color: var(--subtext);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* 闪卡按钮 */
+.card-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.btn-wrong, .btn-right {
+  flex: 1;
+  max-width: 140px;
+  height: 56px;
+  border-radius: 16px;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.btn-wrong:active, .btn-right:active { transform: scale(0.95); }
+.btn-wrong { background: #FFE5E5; color: #FF4757; }
+.btn-right { background: #E5FFE9; color: #2ED573; }
+
+.tts-btn {
+  background: none;
+  border: 2px solid #eee;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+/* ===== 拼写测试 ===== */
+.spell-container {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.spell-question {
+  background: white;
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.spell-chinese {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.spell-hint {
+  font-size: 14px;
+  color: var(--subtext);
+}
+.spell-input {
+  width: 100%;
+  height: 60px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  font-size: 24px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  letter-spacing: 3px;
+  font-family: inherit;
+}
+.spell-input:focus { border-color: var(--primary); }
+.spell-input.correct { border-color: #2ED573; background: #F0FFF3; color: #2ED573; }
+.spell-input.wrong { border-color: #FF4757; background: #FFF5F5; color: #FF4757; }
+
+.spell-answer-reveal {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 18px;
+  color: var(--primary);
+  font-weight: 600;
+  min-height: 28px;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 52px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: opacity 0.2s;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-primary:disabled { background: #ccc; cursor: default; }
+
+/* ===== 听写 ===== */
+.dictation-container {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.listen-btn {
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, #4A90D9, #7B68EE);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 32px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(74,144,217,0.35);
+  transition: transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.listen-btn span { font-size: 16px; font-weight: 600; }
+.listen-btn:active { transform: scale(0.97); }
+.listen-btn.speaking { animation: pulse 0.8s infinite; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(74,144,217,0.35); }
+  50% { box-shadow: 0 8px 40px rgba(74,144,217,0.6); }
+}
+
+/* ===== 句型练习 ===== */
+.sentence-container {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.sentence-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.sentence-en {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.sentence-zh {
+  font-size: 15px;
+  color: var(--subtext);
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+  display: none;
+}
+.sentence-zh.visible { display: block; }
+.reveal-btn {
+  background: none;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* ===== 错题本 ===== */
+.review-container {
+  padding: 20px;
+}
+.wrong-item {
+  background: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wrong-word { font-size: 20px; font-weight: 600; }
+.wrong-chinese { font-size: 13px; color: var(--subtext); margin-top: 2px; }
+.wrong-count {
+  background: #FFE5E5;
+  color: #FF4757;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--subtext);
+}
+.empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 15px; }
+
+/* ===== 结果页 ===== */
+.result-card {
+  background: white;
+  border-radius: 24px;
+  padding: 40px 24px;
+  text-align: center;
+  margin: 20px;
+  box-shadow: var(--shadow);
+}
+.result-score {
+  font-size: 72px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+.result-label { font-size: 16px; color: var(--subtext); margin: 8px 0 20px; }
+.result-stars { font-size: 32px; margin-bottom: 20px; }
+
+/* ===== 通用 ===== */
+.spacer { height: 80px; }
+
+@media (min-width: 600px) {
+  .mode-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .flashcard { height: 300px; }
+}

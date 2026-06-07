@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>拼写测试</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../data/content.js"></script>
+  <style>
+    .spell-page { padding: 16px 20px; max-width: 480px; margin: 0 auto; }
+    .unit-selector {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px;
+    }
+    .unit-selector::-webkit-scrollbar { display: none; }
+    .unit-pill {
+      flex-shrink: 0; padding: 7px 16px; border-radius: 20px;
+      border: 2px solid #eee; background: white;
+      font-size: 13px; cursor: pointer; font-weight: 600; transition: all 0.15s;
+    }
+    .unit-pill.active { border-color: var(--primary); background: var(--primary); color: white; }
+
+    .spell-progress { font-size: 13px; color: #888; text-align: right; margin-bottom: 12px; }
+
+    .word-blanks {
+      display: flex; gap: 6px; justify-content: center;
+      flex-wrap: wrap; margin: 20px 0;
+    }
+    .blank-letter {
+      width: 36px; height: 44px;
+      border-bottom: 3px solid #ccc;
+      font-size: 24px; font-weight: 700;
+      text-align: center; line-height: 44px;
+      transition: border-color 0.2s;
+    }
+    .blank-letter.filled { border-bottom-color: var(--primary); color: var(--primary); }
+    .blank-letter.correct { border-bottom-color: #2ED573; color: #2ED573; }
+    .blank-letter.wrong { border-bottom-color: #FF4757; color: #FF4757; }
+
+    .keyboard-hint {
+      text-align: center; font-size: 13px; color: #aaa; margin: -8px 0 16px;
+    }
+
+    /* 字母键盘 */
+    .keyboard {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 16px;
+    }
+    .key-row { display: flex; gap: 5px; justify-content: center; }
+    .key {
+      flex: 0 0 auto;
+      width: calc((100% - 90px) / 10);
+      min-width: 28px; max-width: 38px;
+      height: 44px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.1s;
+    }
+    .key:active { transform: scale(0.9); background: #eee; }
+    .key-del {
+      width: 52px; max-width: 52px;
+      background: #FF6B6B; color: white;
+      font-size: 18px;
+    }
+    .key-space {
+      width: 120px; max-width: 120px;
+      background: #f0f0f0;
+      font-size: 13px;
+    }
+
+    .result-banner {
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .result-banner.correct-banner { background: #E5FFE9; color: #2ED573; display: block; }
+    .result-banner.wrong-banner { background: #FFE5E5; color: #FF4757; display: block; }
+
+    .score-bar {
+      display: flex; gap: 10px; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .score-item { text-align: center; }
+    .score-num { font-size: 24px; font-weight: 700; }
+    .score-lbl { font-size: 11px; color: #888; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="../index.html">‹</a>
+  <h1>拼写测试</h1>
+</div>
+
+<div class="spell-page">
+  <div class="unit-selector" id="unitSelector"></div>
+
+  <div class="score-bar">
+    <div class="score-item"><div class="score-num" id="scoreRight" style="color:#2ED573">0</div><div class="score-lbl">正确</div></div>
+    <div class="score-item"><div class="score-num" id="scoreWrong" style="color:#FF4757">0</div><div class="score-lbl">错误</div></div>
+    <div class="score-item"><div class="score-num" id="scoreLeft" style="color:#4A90D9">0</div><div class="score-lbl">剩余</div></div>
+  </div>
+
+  <div class="spell-question" id="questionCard">
+    <div class="spell-chinese" id="qChinese">—</div>
+    <div class="spell-hint" id="qHint">请拼写英文单词</div>
+  </div>
+
+  <div class="word-blanks" id="wordBlanks"></div>
+  <div class="keyboard-hint">在下方键盘输入字母</div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+  <div class="keyboard">
+    <div class="key-row" id="row1"></div>
+    <div class="key-row" id="row2"></div>
+    <div class="key-row" id="row3"></div>
+  </div>
+
+  <button class="btn-primary" id="nextBtn" style="display:none" onclick="nextWord()">下一题 →</button>
+</div>
+
+<script>
+const ROWS = [
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['a','s','d','f','g','h','j','k','l'],
+  ['z','x','c','v','b','n','m','⌫']
+];
+
+const params = new URLSearchParams(location.search);
+const unitParam = params.get('unit');
+const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
+if (!data) location.href = '../index.html';
+
+let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+let queue = [], current = 0, typed = '', answered = false;
+let rightCount = 0, wrongCount = 0;
+let selectedUnit = unitParam || 'all';
+
+// 建键盘
+ROWS.forEach((row, i) => {
+  const rowEl = document.getElementById(`row${i+1}`);
+  row.forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'key' + (k === '⌫' ? ' key-del' : '');
+    btn.textContent = k;
+    btn.onclick = () => pressKey(k);
+    rowEl.appendChild(btn);
+  });
+});
+// 空格行
+const row3 = document.getElementById('row3');
+const spaceBtn = document.createElement('button');
+spaceBtn.className = 'key key-space';
+spaceBtn.textContent = 'SPACE';
+spaceBtn.onclick = () => pressKey(' ');
+row3.appendChild(spaceBtn);
+
+function buildUnitSelector() {
+  const sel = document.getElementById('unitSelector');
+  sel.innerHTML = '';
+  [{ label: '全部', id: 'all' }, ...data.units.map(u => ({ label: `U${u.id}`, id: u.id })), { label: 'Rev', id: 'review' }]
+    .forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'unit-pill' + (selectedUnit == item.id ? ' active' : '');
+      btn.textContent = item.label;
+      btn.onclick = () => { selectedUnit = item.id; buildUnitSelector(); loadWords(); };
+      sel.appendChild(btn);
+    });
+}
+
+function getWords() {
+  if (selectedUnit === 'all') return data.units.flatMap(u => u.vocabulary).concat(data.review.vocabulary);
+  if (selectedUnit === 'review') return data.review.vocabulary;
+  const u = data.units.find(u => u.id == selectedUnit);
+  return u ? u.vocabulary : [];
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function loadWords() {
+  queue = shuffle([...getWords()]);
+  current = 0; rightCount = 0; wrongCount = 0;
+  updateScores();
+  nextWord();
+}
+
+function nextWord() {
+  if (current >= queue.length) { showComplete(); return; }
+  const v = queue[current];
+  typed = '';
+  answered = false;
+
+  document.getElementById('qChinese').textContent = v.chinese;
+  document.getElementById('qHint').textContent = `${v.word.length} 个字母`;
+  document.getElementById('resultBanner').className = 'result-banner';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  renderBlanks(v.word, '');
+  updateScores();
+}
+
+function renderBlanks(word, input, state) {
+  const container = document.getElementById('wordBlanks');
+  container.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const div = document.createElement('div');
+    div.className = 'blank-letter';
+    if (input[i]) {
+      div.textContent = input[i];
+      if (state === 'correct') div.classList.add('correct');
+      else if (state === 'wrong') div.classList.add('wrong');
+      else div.classList.add('filled');
+    }
+    container.appendChild(div);
+  }
+}
+
+function pressKey(k) {
+  if (answered) return;
+  const v = queue[current];
+  if (k === '⌫') {
+    typed = typed.slice(0, -1);
+    renderBlanks(v.word, typed);
+    return;
+  }
+  if (typed.length >= v.word.length) return;
+  typed += k;
+  renderBlanks(v.word, typed);
+
+  if (typed.length === v.word.length) {
+    checkAnswer();
+  }
+}
+
+function checkAnswer() {
+  const v = queue[current];
+  const correct = typed.toLowerCase() === v.word.toLowerCase();
+  answered = true;
+
+  const banner = document.getElementById('resultBanner');
+  if (correct) {
+    rightCount++;
+    progress[v.word] = (progress[v.word] || 0) + 1;
+    renderBlanks(v.word, typed, 'correct');
+    banner.textContent = '✅ 正确！太棒了！';
+    banner.className = 'result-banner correct-banner';
+    speak(v.word);
+    setTimeout(() => { current++; nextWord(); }, 1200);
+  } else {
+    wrongCount++;
+    progress[v.word] = (progress[v.word] || 0) - 1;
+    renderBlanks(v.word, typed, 'wrong');
+    banner.innerHTML = `❌ 正确答案是：<b>${v.word}</b>`;
+    banner.className = 'result-banner wrong-banner';
+    speak(v.word);
+    document.getElementById('nextBtn').style.display = 'block';
+  }
+
+  localStorage.setItem('progress', JSON.stringify(progress));
+  updateScores();
+}
+
+function updateScores() {
+  document.getElementById('scoreRight').textContent = rightCount;
+  document.getElementById('scoreWrong').textContent = wrongCount;
+  document.getElementById('scoreLeft').textContent = Math.max(0, queue.length - current);
+}
+
+function showComplete() {
+  document.getElementById('questionCard').innerHTML = `
+    <div style="font-size:48px;margin-bottom:12px">${rightCount/(rightCount+wrongCount||1) >= 0.8 ? '🌟' : '💪'}</div>
+    <div style="font-size:20px;font-weight:700">测试完成！</div>
+    <div style="font-size:14px;color:#888;margin-top:8px">
+      正确 ${rightCount} 个 / 错误 ${wrongCount} 个
+    </div>
+  `;
+  document.getElementById('wordBlanks').innerHTML = '';
+  document.getElementById('resultBanner').className = 'result-banner';
+  document.getElementById('nextBtn').style.display = 'block';
+  document.getElementById('nextBtn').textContent = '再来一次 🔄';
+  document.getElementById('nextBtn').onclick = loadWords;
+}
+
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// 支持物理键盘
+document.addEventListener('keydown', e => {
+  if (e.key === 'Backspace') pressKey('⌫');
+  else if (e.key === 'Enter' && answered) { current++; nextWord(); }
+  else if (/^[a-zA-Z]$/.test(e.key)) pressKey(e.key.toLowerCase());
+});
+
+buildUnitSelector();
+loadWords();
+</script>
+</body>
+</html>

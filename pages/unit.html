@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>单元词汇</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../data/content.js"></script>
+  <style>
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 16px 20px 80px;
+    }
+    .vocab-item {
+      background: white;
+      border-radius: 14px;
+      padding: 14px 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      border: 2px solid transparent;
+    }
+    .vocab-item:active { transform: scale(0.97); }
+    .vocab-item.mastered { border-color: #2ED573; background: #F0FFF4; }
+    .vocab-item.needs-review { border-color: #FF4757; background: #FFF5F5; }
+    .vocab-item.playing { border-color: var(--primary); background: #EEF5FF; transform: scale(1.02); }
+    .vocab-word {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .vocab-chinese { font-size: 13px; color: #888; }
+    .vocab-status { font-size: 14px; }
+
+    .read-all-bar {
+      padding: 10px 20px 0;
+      display: flex;
+      gap: 8px;
+    }
+    .btn-read-all {
+      flex: 1;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .btn-read-all.playing { opacity: 0.7; }
+    .btn-read-start { background: #EEF5FF; color: var(--primary); }
+    .btn-read-stop  { background: #FFE5E5; color: #FF4757; display: none; }
+
+    .action-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 12px 20px;
+      background: white;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+      display: flex;
+      gap: 10px;
+    }
+    .action-bar button {
+      flex: 1;
+      height: 48px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-flash { background: #4A90D9; color: white; }
+    .btn-spell { background: #FF6B6B; color: white; }
+
+    .unit-hero {
+      padding: 24px 20px 16px;
+      color: white;
+    }
+    .unit-hero h2 { font-size: 20px; margin-bottom: 4px; }
+    .unit-hero p { font-size: 13px; opacity: 0.85; }
+
+    .tabs {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid #eee;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 0 0 auto;
+      padding: 12px 18px;
+      text-align: center;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      color: #888;
+      transition: all 0.2s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      white-space: nowrap;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* 句型 tab */
+    .sentence-list { padding: 16px 20px 100px; }
+    .sentence-row {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    .sent-en {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .sent-zh {
+      font-size: 14px;
+      color: #888;
+    }
+    .sent-tts {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      float: right;
+      padding: 0;
+    }
+
+    /* chunk tab */
+    .chunk-list { padding: 16px 20px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chunk-tag {
+      background: white;
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .chunk-tag:active { transform: scale(0.97); }
+    .chunk-en { font-size: 14px; font-weight: 600; }
+    .chunk-zh { font-size: 12px; color: #888; }
+    .chunk-tts { font-size: 14px; margin-left: 4px; }
+    .sentence-row.playing { border: 2px solid var(--primary); background: #EEF5FF; }
+    .chunk-tag.playing { border: 2px solid var(--primary); background: #EEF5FF; transform: scale(1.02); }
+
+    /* 对话 tab */
+    .dialogue-list { padding: 16px 20px 100px; display: flex; flex-direction: column; gap: 14px; }
+    .dialogue-line { display: flex; flex-direction: column; gap: 4px; }
+    .dialogue-line.right { align-items: flex-end; }
+    .dialogue-line.left  { align-items: flex-start; }
+    .dlg-speaker {
+      font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase;
+      padding: 0 12px;
+    }
+    .dlg-bubble {
+      max-width: 82%; padding: 12px 16px; border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer;
+      position: relative;
+    }
+    .dialogue-line.right .dlg-bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+    .dialogue-line.left  .dlg-bubble { background: white; color: #333; border-bottom-left-radius: 4px; }
+    .dlg-en { font-size: 15px; line-height: 1.55; font-weight: 500; }
+    .dlg-zh { font-size: 12px; margin-top: 5px; opacity: 0.72; }
+    .dialogue-line.right .dlg-zh { color: rgba(255,255,255,0.85); }
+    .dialogue-line.left  .dlg-zh { color: #888; }
+    .dlg-bubble.playing { outline: 3px solid #FFD700; }
+
+    /* 课文 tab */
+    .reading-container { padding: 16px 20px 100px; }
+    .reading-title { font-size: 17px; font-weight: 700; color: #333; margin-bottom: 14px; }
+    .reading-para {
+      background: white; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; font-size: 15px;
+      line-height: 1.75; color: #333; border-left: 3px solid transparent; transition: all 0.15s;
+    }
+    .reading-para:active { transform: scale(0.98); }
+    .reading-para.playing { border-left-color: var(--primary); background: #EEF5FF; }
+    .reading-section-heading {
+      font-size: 12px; font-weight: 700; color: #aaa; text-transform: uppercase;
+      letter-spacing: 1px; margin: 14px 0 6px 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="../index.html">‹</a>
+  <h1 id="pageTitle">单元词汇</h1>
+</div>
+
+<div id="unitHero" class="unit-hero">
+  <h2 id="heroTitle"></h2>
+  <p id="heroSub"></p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('words')">单词</button>
+  <button class="tab" onclick="showTab('sentences')">句型</button>
+  <button class="tab" onclick="showTab('chunks')">短语</button>
+  <button class="tab" onclick="showTab('dialogue')">对话</button>
+  <button class="tab" onclick="showTab('reading')">课文</button>
+</div>
+
+<div id="tab-words" class="tab-content active">
+  <div class="read-all-bar">
+    <button class="btn-read-all btn-read-start" id="btnReadAll" onclick="readAll()">🔊 全部朗读</button>
+    <button class="btn-read-all btn-read-stop"  id="btnStop"   onclick="stopAll()">⏹ 停止</button>
+  </div>
+  <div class="vocab-grid" id="vocabGrid"></div>
+</div>
+<div id="tab-sentences" class="tab-content">
+  <div class="read-all-bar">
+    <button class="btn-read-all btn-read-start" id="btnReadAllSent" onclick="readAllSentences()">🔊 全部朗读</button>
+    <button class="btn-read-all btn-read-stop"  id="btnStopSent"   onclick="stopAll()">⏹ 停止</button>
+  </div>
+  <div class="sentence-list" id="sentenceList"></div>
+</div>
+<div id="tab-dialogue" class="tab-content">
+  <div class="read-all-bar">
+    <button class="btn-read-all btn-read-start" id="btnReadAllDlg" onclick="readAllDialogue()">🔊 全部朗读</button>
+    <button class="btn-read-all btn-read-stop"  id="btnStopDlg"   onclick="stopAll()">⏹ 停止</button>
+  </div>
+  <div class="dialogue-list" id="dialogueList"></div>
+</div>
+<div id="tab-reading" class="tab-content">
+  <div class="read-all-bar">
+    <button class="btn-read-all btn-read-start" id="btnReadAllReading" onclick="readAllReading()">🔊 全文朗读</button>
+    <button class="btn-read-all btn-read-stop"  id="btnStopReading"   onclick="stopAll()">⏹ 停止</button>
+  </div>
+  <div class="reading-container" id="readingContainer"></div>
+</div>
+<div id="tab-chunks" class="tab-content">
+  <div class="read-all-bar">
+    <button class="btn-read-all btn-read-start" id="btnReadAllChunk" onclick="readAllChunks()">🔊 全部朗读</button>
+    <button class="btn-read-all btn-read-stop"  id="btnStopChunk"   onclick="stopAll()">⏹ 停止</button>
+  </div>
+  <div class="chunk-list" id="chunkList"></div>
+</div>
+
+<div class="action-bar" id="actionBar">
+  <button class="btn-flash" id="flashBtn">🃏 闪卡练习</button>
+  <button class="btn-spell" id="spellBtn">✏️ 拼写测试</button>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const unitId = params.get('id');
+const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
+const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+
+if (!data) { location.href = '../index.html'; }
+
+const unit = unitId === 'review' ? { ...data.review, id: 'review' } :
+  data.units.find(u => u.id == unitId);
+
+if (!unit) { location.href = '../index.html'; }
+
+document.getElementById('pageTitle').textContent = `Unit ${unit.id === 'review' ? 'R' : unit.id}`;
+document.getElementById('heroTitle').textContent = unit.title;
+document.getElementById('heroSub').textContent = `${unit.theme} · ${unit.vocabulary.length}个单词`;
+document.getElementById('unitHero').style.background = unit.color || '#4A90D9';
+
+updateActionBar('words');
+
+// 词汇格子
+const grid = document.getElementById('vocabGrid');
+unit.vocabulary.forEach(v => {
+  const score = progress[v.word] || 0;
+  const div = document.createElement('div');
+  div.className = 'vocab-item' + (score >= 3 ? ' mastered' : score < 0 ? ' needs-review' : '');
+  div.dataset.word = v.word;
+  div.onclick = () => speakWord(v.word);
+  div.innerHTML = `
+    <div class="vocab-word">
+      <span>${v.word}</span>
+      <span class="vocab-speaker">🔊</span>
+    </div>
+    <div class="vocab-chinese">${v.chinese}</div>
+  `;
+  grid.appendChild(div);
+});
+
+let readAllTimer = null;
+let isReadingAll = false;
+
+function speakWord(word) {
+  // 高亮当前卡片
+  document.querySelectorAll('.vocab-item').forEach(el => el.classList.remove('playing'));
+  const card = document.querySelector(`.vocab-item[data-word="${word}"]`);
+  if (card) {
+    card.classList.add('playing');
+    setTimeout(() => card.classList.remove('playing'), 1200);
+  }
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'en-US'; u.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+function readAll() {
+  const words = unit.vocabulary.map(v => v.word);
+  let i = 0;
+  isReadingAll = true;
+  document.getElementById('btnReadAll').style.display = 'none';
+  document.getElementById('btnStop').style.display = '';
+
+  function next() {
+    if (!isReadingAll || i >= words.length) {
+      stopAll(); return;
+    }
+    speakWord(words[i]);
+    i++;
+    // 等当前词读完再读下一个（用 onend 回调）
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(words[i - 1]);
+    u.lang = 'en-US'; u.rate = 0.85;
+    u.onend = () => { readAllTimer = setTimeout(next, 600); };
+
+    // 高亮
+    document.querySelectorAll('.vocab-item').forEach(el => el.classList.remove('playing'));
+    const card = document.querySelector(`.vocab-item[data-word="${words[i-1]}"]`);
+    if (card) {
+      card.classList.add('playing');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    speechSynthesis.speak(u);
+  }
+
+  next();
+}
+
+function stopAll() {
+  isReadingAll = false;
+  clearTimeout(readAllTimer);
+  speechSynthesis.cancel();
+  document.querySelectorAll('.vocab-item, .sentence-row, .chunk-tag, .reading-para').forEach(el => el.classList.remove('playing'));
+  document.getElementById('btnReadAll').style.display = '';
+  document.getElementById('btnStop').style.display = 'none';
+  document.getElementById('btnReadAllSent').style.display = '';
+  document.getElementById('btnStopSent').style.display = 'none';
+  document.getElementById('btnReadAllChunk').style.display = '';
+  document.getElementById('btnStopChunk').style.display = 'none';
+  document.getElementById('btnReadAllDlg').style.display = '';
+  document.getElementById('btnStopDlg').style.display = 'none';
+  document.getElementById('btnReadAllReading').style.display = '';
+  document.getElementById('btnStopReading').style.display = 'none';
+  document.querySelectorAll('.dlg-bubble').forEach(el => el.classList.remove('playing'));
+}
+
+function readAllSentences() {
+  const items = Array.from(document.querySelectorAll('#sentenceList .sentence-row'));
+  if (!items.length) return;
+  let i = 0;
+  isReadingAll = true;
+  document.getElementById('btnReadAllSent').style.display = 'none';
+  document.getElementById('btnStopSent').style.display = '';
+
+  function next() {
+    if (!isReadingAll || i >= items.length) { stopAll(); return; }
+    const row = items[i];
+    document.querySelectorAll('.sentence-row').forEach(el => el.classList.remove('playing'));
+    row.classList.add('playing');
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const text = row.querySelector('.sent-en')?.textContent.trim() || '';
+    i++;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85;
+    u.onend = () => { readAllTimer = setTimeout(next, 600); };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function readAllDialogue() {
+  const items = Array.from(document.querySelectorAll('#dialogueList .dlg-bubble'));
+  if (!items.length) return;
+  let i = 0;
+  isReadingAll = true;
+  document.getElementById('btnReadAllDlg').style.display = 'none';
+  document.getElementById('btnStopDlg').style.display = '';
+
+  function next() {
+    if (!isReadingAll || i >= items.length) { stopAll(); return; }
+    const bubble = items[i];
+    document.querySelectorAll('.dlg-bubble').forEach(el => el.classList.remove('playing'));
+    bubble.classList.add('playing');
+    bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const text = bubble.querySelector('.dlg-en')?.textContent.trim() || '';
+    i++;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85;
+    u.onend = () => { readAllTimer = setTimeout(next, 700); };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function readAllChunks() {
+  const items = Array.from(document.querySelectorAll('#chunkList .chunk-tag'));
+  if (!items.length) return;
+  let i = 0;
+  isReadingAll = true;
+  document.getElementById('btnReadAllChunk').style.display = 'none';
+  document.getElementById('btnStopChunk').style.display = '';
+
+  function next() {
+    if (!isReadingAll || i >= items.length) { stopAll(); return; }
+    const tag = items[i];
+    document.querySelectorAll('.chunk-tag').forEach(el => el.classList.remove('playing'));
+    tag.classList.add('playing');
+    tag.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const text = tag.querySelector('.chunk-en')?.childNodes[0]?.textContent.trim() || '';
+    i++;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85;
+    u.onend = () => { readAllTimer = setTimeout(next, 600); };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+  next();
+}
+
+// 句型
+const sentList = document.getElementById('sentenceList');
+(unit.sentences || []).forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'sentence-row';
+  div.innerHTML = `
+    <div>
+      <button class="sent-tts" onclick="speak(\`${s.en.replace(/`/g,"'")}\`,event)">🔊</button>
+      <div class="sent-en">${s.en}</div>
+      <div class="sent-zh">${s.zh}</div>
+    </div>
+  `;
+  sentList.appendChild(div);
+});
+
+// 对话
+const dlgList = document.getElementById('dialogueList');
+const dialogues = unit.dialogues || [];
+const speakers = [...new Set(dialogues.map(d => d.speaker))];
+(dialogues).forEach((d, i) => {
+  const isRight = d.speaker === speakers[0];
+  const line = document.createElement('div');
+  line.className = 'dialogue-line ' + (isRight ? 'right' : 'left');
+  line.innerHTML = `
+    <div class="dlg-speaker">${d.speaker}</div>
+    <div class="dlg-bubble" id="dlg-${i}" onclick="speak(\`${d.en.replace(/`/g,"'")}\`)">
+      <div class="dlg-en">${d.en}</div>
+      <div class="dlg-zh">${d.zh}</div>
+    </div>
+  `;
+  dlgList.appendChild(line);
+});
+
+// 课文
+const readingContainer = document.getElementById('readingContainer');
+const reading = unit.reading;
+if (reading) {
+  const titleEl = document.createElement('div');
+  titleEl.className = 'reading-title';
+  titleEl.textContent = reading.title;
+  readingContainer.appendChild(titleEl);
+
+  reading.paragraphs.forEach((p, i) => {
+    if (p.startsWith('## ')) {
+      const heading = document.createElement('div');
+      heading.className = 'reading-section-heading';
+      heading.textContent = p.slice(3);
+      readingContainer.appendChild(heading);
+    } else {
+      const para = document.createElement('div');
+      para.className = 'reading-para';
+      para.id = 'rp-' + i;
+      para.textContent = p;
+      para.onclick = () => speak(p);
+      readingContainer.appendChild(para);
+    }
+  });
+}
+
+function readAllReading() {
+  const items = Array.from(document.querySelectorAll('#readingContainer .reading-para'));
+  if (!items.length) return;
+  let i = 0;
+  isReadingAll = true;
+  document.getElementById('btnReadAllReading').style.display = 'none';
+  document.getElementById('btnStopReading').style.display = '';
+
+  function next() {
+    if (!isReadingAll || i >= items.length) { stopAll(); return; }
+    const para = items[i];
+    document.querySelectorAll('.reading-para').forEach(el => el.classList.remove('playing'));
+    para.classList.add('playing');
+    para.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const text = para.textContent.trim();
+    i++;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85;
+    u.onend = () => { readAllTimer = setTimeout(next, 700); };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+  next();
+}
+
+// 短语
+const chunkList = document.getElementById('chunkList');
+(unit.chunks || []).forEach(c => {
+  const en = typeof c === 'string' ? c : c.en;
+  const zh = typeof c === 'string' ? '' : c.zh;
+  const div = document.createElement('div');
+  div.className = 'chunk-tag';
+  div.onclick = () => speak(en);
+  div.innerHTML = `
+    <div class="chunk-en">${en} <span class="chunk-tts">🔊</span></div>
+    ${zh ? `<div class="chunk-zh">${zh}</div>` : ''}
+  `;
+  chunkList.appendChild(div);
+});
+
+function speak(text, e) {
+  if (e) e.stopPropagation();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+function showTab(name) {
+  stopAll();
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  updateActionBar(name);
+}
+
+function updateActionBar(tab) {
+  const bar = document.getElementById('actionBar');
+  if (tab === 'words') {
+    bar.innerHTML = `
+      <button class="btn-flash" onclick="location.href='flashcard.html?unit=${unitId}'">🃏 闪卡练习</button>
+      <button class="btn-spell" onclick="location.href='spell.html?unit=${unitId}'">✏️ 拼写测试</button>`;
+  } else if (tab === 'sentences') {
+    bar.innerHTML = `
+      <button class="btn-flash" style="background:#7C4DFF" onclick="location.href='sentences.html?unit=${unitId}&mode=practice'">🎯 练习</button>
+      <button class="btn-spell" style="background:#2ED573" onclick="location.href='sentences.html?unit=${unitId}'">📖 背诵</button>`;
+  } else if (tab === 'dialogue') {
+    bar.innerHTML = `
+      <button class="btn-flash" style="background:#2ED573;flex:1" onclick="readAllDialogue()">🔊 跟读对话</button>`;
+  } else if (tab === 'reading') {
+    bar.innerHTML = `
+      <button class="btn-flash" style="background:#FF6B6B;flex:1" onclick="readAllReading()">🔊 全文朗读</button>`;
+  } else {
+    bar.innerHTML = `
+      <button class="btn-flash" style="background:#7C4DFF" onclick="location.href='sentences.html?unit=${unitId}'">🎯 练习</button>
+      <button class="btn-spell" style="background:#FF9500" onclick="location.href='dictation.html?unit=${unitId}'">🎧 听写</button>`;
+  }
+}
+</script>
+</body>
+</html>

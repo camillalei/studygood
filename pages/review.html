@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>错题本</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../data/content.js"></script>
+  <style>
+    .review-page { padding: 16px 20px 80px; max-width: 500px; margin: 0 auto; }
+
+    .tabs { display:flex; background:white; border-bottom:1px solid #eee; position:sticky; top:60px; z-index:10; }
+    .tab { flex:1; padding:12px; text-align:center; font-size:14px; cursor:pointer; border-bottom:3px solid transparent; color:#888; background:none; border-top:none; border-left:none; border-right:none; }
+    .tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+
+    .tab-content { display:none; padding: 16px 20px 80px; }
+    .tab-content.active { display:block; }
+
+    /* 错题列表 */
+    .wrong-card {
+      background:white; border-radius:14px; padding:14px 16px;
+      margin-bottom:10px; box-shadow:var(--shadow);
+      display:flex; align-items:center; gap:12px;
+    }
+    .wc-word-area { flex:1; }
+    .wc-word { font-size:20px; font-weight:700; }
+    .wc-chinese { font-size:13px; color:#888; margin-top:2px; }
+    .wc-unit { font-size:11px; font-weight:700; color:white; padding:2px 8px; border-radius:8px; margin-top:4px; display:inline-block; }
+    .wc-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+    .wc-count { background:#FFE5E5; color:#FF4757; border-radius:20px; padding:3px 10px; font-size:12px; font-weight:700; }
+    .wc-tts { background:none; border:none; font-size:20px; cursor:pointer; }
+
+    /* 掌握列表 */
+    .mastered-card {
+      background:#F0FFF4; border-radius:14px; padding:14px 16px;
+      margin-bottom:10px; box-shadow:var(--shadow);
+      display:flex; align-items:center; gap:12px;
+      border:2px solid #2ED573;
+    }
+    .mc-word { font-size:18px; font-weight:700; flex:1; }
+    .mc-chinese { font-size:13px; color:#888; }
+    .mc-badge { color:#2ED573; font-size:20px; }
+
+    /* 总体统计 */
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .stat-card {
+      background:white; border-radius:16px; padding:20px 16px;
+      box-shadow:var(--shadow); text-align:center;
+    }
+    .stat-big { font-size:32px; font-weight:800; }
+    .stat-label { font-size:13px; color:#888; margin-top:4px; }
+
+    .unit-progress { background:white; border-radius:14px; padding:16px; box-shadow:var(--shadow); margin-bottom:12px; }
+    .up-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .up-title { font-size:15px; font-weight:600; }
+    .up-pct { font-size:13px; color:#888; }
+
+    .action-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      padding:12px 20px; background:white;
+      box-shadow:0 -2px 12px rgba(0,0,0,0.08);
+      display:flex; gap:10px;
+    }
+    .action-bar button { flex:1; height:48px; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; }
+    .btn-fc { background:#4A90D9; color:white; }
+    .btn-reset { background:#FFE5E5; color:#FF4757; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="../index.html">‹</a>
+  <h1>错题本 & 进度</h1>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('wrong', this)">待复习</button>
+  <button class="tab" onclick="showTab('mastered', this)">已掌握</button>
+  <button class="tab" onclick="showTab('stats', this)">学习统计</button>
+</div>
+
+<div id="tab-wrong" class="tab-content active"></div>
+<div id="tab-mastered" class="tab-content"></div>
+<div id="tab-stats" class="tab-content"></div>
+
+<div class="action-bar" id="actionBar">
+  <button class="btn-fc" id="practiceWrongBtn">🃏 专练错题</button>
+  <button class="btn-reset" onclick="confirmReset()">重置进度</button>
+</div>
+
+<script>
+const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
+if (!data) location.href = '../index.html';
+
+let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+
+const allWords = data.units.flatMap(u =>
+  u.vocabulary.map(v => ({...v, unitId:u.id, unitTitle:u.title, unitColor:u.color}))
+).concat(data.review.vocabulary.map(v => ({...v, unitId:'review', unitTitle:data.review.title, unitColor:data.review.color})));
+
+function getWrongWords() {
+  return allWords.filter(v => (progress[v.word]||0) < 0)
+    .sort((a,b) => (progress[a.word]||0) - (progress[b.word]||0));
+}
+
+function getMasteredWords() {
+  return allWords.filter(v => (progress[v.word]||0) >= 3);
+}
+
+function renderWrong() {
+  const container = document.getElementById('tab-wrong');
+  const words = getWrongWords();
+  if (!words.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">🎉</div>
+        <p>没有错题，继续保持！</p>
+      </div>`;
+    document.getElementById('practiceWrongBtn').disabled = true;
+    document.getElementById('practiceWrongBtn').style.background = '#ccc';
+    return;
+  }
+
+  container.innerHTML = '';
+  words.forEach(v => {
+    const score = progress[v.word] || 0;
+    const div = document.createElement('div');
+    div.className = 'wrong-card';
+    div.innerHTML = `
+      <div class="wc-word-area">
+        <div class="wc-word">${v.word}</div>
+        <div class="wc-chinese">${v.chinese}</div>
+        <div class="wc-unit" style="background:${v.unitColor}">${v.unitId === 'review' ? 'Review' : 'Unit ' + v.unitId}</div>
+      </div>
+      <div class="wc-right">
+        <div class="wc-count">错了 ${Math.abs(score)} 次</div>
+        <button class="wc-tts" onclick="speak('${v.word}')">🔊</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById('practiceWrongBtn').onclick = () => {
+    // 存储错题列表给闪卡用
+    const wrongIds = getWrongWords().map(v => v.word);
+    localStorage.setItem('practiceWrongList', JSON.stringify(wrongIds));
+    location.href = 'flashcard.html?mode=wrong';
+  };
+}
+
+function renderMastered() {
+  const container = document.getElementById('tab-mastered');
+  const words = getMasteredWords();
+  if (!words.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">📚</div>
+        <p>还没有掌握的单词，快去练习吧！</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div style="font-size:13px;color:#888;margin-bottom:12px;padding:0 0 0 4px">已掌握 ${words.length} / ${allWords.length} 个单词 🌟</div>`;
+  words.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'mastered-card';
+    div.innerHTML = `
+      <div>
+        <div class="mc-word">${v.word}</div>
+        <div class="mc-chinese">${v.chinese}</div>
+      </div>
+      <div class="mc-badge">✅</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function renderStats() {
+  const container = document.getElementById('tab-stats');
+  const mastered = getMasteredWords().length;
+  const wrong = getWrongWords().length;
+  const seen = allWords.filter(v => progress[v.word] !== undefined).length;
+  const total = allWords.length;
+
+  container.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-big" style="color:#2ED573">${mastered}</div>
+        <div class="stat-label">已掌握单词</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-big" style="color:#FF4757">${wrong}</div>
+        <div class="stat-label">待复习单词</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-big" style="color:#4A90D9">${seen}</div>
+        <div class="stat-label">已接触单词</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-big" style="color:#888">${total}</div>
+        <div class="stat-label">全册单词总数</div>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:#888;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">各单元进度</div>
+  `;
+
+  data.units.forEach(unit => {
+    const words = unit.vocabulary;
+    const done = words.filter(v => (progress[v.word]||0) >= 3).length;
+    const pct = words.length ? Math.round(done/words.length*100) : 0;
+    const div = document.createElement('div');
+    div.className = 'unit-progress';
+    div.innerHTML = `
+      <div class="up-header">
+        <div class="up-title" style="display:flex;align-items:center;gap:8px">
+          <span style="background:${unit.color};color:white;padding:2px 8px;border-radius:8px;font-size:12px;font-weight:700">U${unit.id}</span>
+          ${unit.title}
+        </div>
+        <div class="up-pct">${done}/${words.length}</div>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="width:${pct}%;background:${unit.color}"></div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  // Review
+  const rev = data.review;
+  const rDone = rev.vocabulary.filter(v=>(progress[v.word]||0)>=3).length;
+  const rPct = rev.vocabulary.length ? Math.round(rDone/rev.vocabulary.length*100) : 0;
+  const rdiv = document.createElement('div');
+  rdiv.className = 'unit-progress';
+  rdiv.innerHTML = `
+    <div class="up-header">
+      <div class="up-title" style="display:flex;align-items:center;gap:8px">
+        <span style="background:${rev.color};color:white;padding:2px 8px;border-radius:8px;font-size:12px;font-weight:700">Rev</span>
+        ${rev.title}
+      </div>
+      <div class="up-pct">${rDone}/${rev.vocabulary.length}</div>
+    </div>
+    <div class="progress-bar" style="height:8px">
+      <div class="progress-fill" style="width:${rPct}%;background:${rev.color}"></div>
+    </div>
+  `;
+  container.appendChild(rdiv);
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('actionBar').style.display = name==='wrong' ? '' : 'none';
+}
+
+function confirmReset() {
+  if (confirm('确定要重置所有学习进度吗？此操作不可撤销。')) {
+    localStorage.removeItem('progress');
+    localStorage.removeItem('studyDays');
+    progress = {};
+    renderWrong();
+    renderMastered();
+    renderStats();
+    alert('进度已重置');
+  }
+}
+
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+renderWrong();
+renderMastered();
+renderStats();
+</script>
+</body>
+</html>

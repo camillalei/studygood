@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>单词闪卡</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../data/content.js"></script>
+  <style>
+    .fc-page { padding: 16px 20px 20px; max-width: 480px; margin: 0 auto; }
+    .unit-selector {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px;
+    }
+    .unit-selector::-webkit-scrollbar { display: none; }
+    .unit-pill {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 2px solid #eee;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .unit-pill.active { border-color: var(--primary); background: var(--primary); color: white; }
+
+    .fc-status {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px;
+    }
+    .fc-status .label { font-size: 13px; color: #888; }
+    .fc-status .nums { font-size: 13px; font-weight: 600; }
+
+    /* 进度胶囊 */
+    .progress-dots {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #e0e0e0;
+      transition: background 0.3s;
+    }
+    .dot.seen { background: #aaa; }
+    .dot.right { background: #2ED573; }
+    .dot.wrong { background: #FF4757; }
+
+    .card-wrap {
+      position: relative; width: 100%; max-width: 400px; margin: 0 auto;
+    }
+
+    /* 滑动手势区 */
+    .swipe-hint {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: #ccc; margin-top: 8px; padding: 0 4px;
+    }
+
+    .finish-screen {
+      display: none; text-align: center; padding: 40px 20px;
+    }
+    .finish-screen.show { display: block; }
+    .finish-emoji { font-size: 64px; margin-bottom: 16px; }
+    .finish-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .finish-sub { font-size: 14px; color: #888; margin-bottom: 24px; }
+
+    .fc-main { transition: opacity 0.2s; }
+    .fc-main.hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="../index.html">‹</a>
+  <h1>单词闪卡</h1>
+</div>
+
+<div class="fc-page">
+  <div class="unit-selector" id="unitSelector"></div>
+
+  <div class="fc-main" id="fcMain">
+    <div class="fc-status">
+      <span class="label">剩余 <b id="remaining">0</b> 张</span>
+      <span class="nums">✅ <span id="rightCount">0</span> &nbsp; ❌ <span id="wrongCount">0</span></span>
+    </div>
+
+    <div class="progress-dots" id="progressDots"></div>
+
+    <div class="card-wrap">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="flashcard-inner">
+          <div class="flashcard-front" id="cardFront">
+            <div class="card-word" id="cardWord">—</div>
+            <div class="card-hint">点击查看中文 👆</div>
+          </div>
+          <div class="flashcard-back" id="cardBack">
+            <div class="card-chinese" id="cardChinese">—</div>
+            <div class="card-example" id="cardExample"></div>
+          </div>
+        </div>
+      </div>
+      <div class="swipe-hint"><span>👈 不认识</span><span>认识 👉</span></div>
+    </div>
+
+    <div style="text-align:center; margin: 16px 0;">
+      <button class="tts-btn" onclick="speakCurrent()">🔊</button>
+    </div>
+
+    <div class="card-actions">
+      <button class="btn-wrong" onclick="markCard(false)">✗<br><small>不认识</small></button>
+      <button class="btn-right" onclick="markCard(true)">✓<br><small>认识</small></button>
+    </div>
+  </div>
+
+  <div class="finish-screen" id="finishScreen">
+    <div class="finish-emoji" id="finishEmoji">🎉</div>
+    <div class="finish-title" id="finishTitle">完成！</div>
+    <div class="finish-sub" id="finishSub"></div>
+    <button class="btn-primary" onclick="restartWrong()" id="retryBtn" style="margin-bottom:12px">再练错误单词</button>
+    <button class="btn-primary" style="background:#888" onclick="resetAndRestart()">重新开始</button>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const unitParam = params.get('unit');
+const modeParam = params.get('mode'); // 'wrong' = 专练错题
+const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
+if (!data) location.href = '../index.html';
+
+let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+let queue = [];
+let current = 0;
+let rightCount = 0;
+let wrongCount = 0;
+let selectedUnit = unitParam || 'all';
+let isFlipped = false;
+let wrongCards = [];
+
+// 触摸滑动
+let touchStartX = 0;
+const card = document.getElementById('flashcard');
+card.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+card.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx > 0) markCard(true);
+    else markCard(false);
+  }
+});
+
+function buildUnitSelector() {
+  const sel = document.getElementById('unitSelector');
+  sel.innerHTML = '';
+  const all = document.createElement('button');
+  all.className = 'unit-pill' + (selectedUnit === 'all' ? ' active' : '');
+  all.textContent = '全部';
+  all.onclick = () => switchUnit('all');
+  sel.appendChild(all);
+
+  data.units.forEach(u => {
+    const btn = document.createElement('button');
+    btn.className = 'unit-pill' + (selectedUnit == u.id ? ' active' : '');
+    btn.textContent = `U${u.id}`;
+    btn.style.borderColor = selectedUnit == u.id ? u.color : '';
+    btn.style.background = selectedUnit == u.id ? u.color : '';
+    btn.onclick = () => switchUnit(u.id);
+    sel.appendChild(btn);
+  });
+
+  const rb = document.createElement('button');
+  rb.className = 'unit-pill' + (selectedUnit === 'review' ? ' active' : '');
+  rb.textContent = 'Rev';
+  rb.onclick = () => switchUnit('review');
+  sel.appendChild(rb);
+}
+
+function switchUnit(id) {
+  selectedUnit = id;
+  buildUnitSelector();
+  loadCards();
+}
+
+function getWords(unitId) {
+  if (unitId === 'all') return data.units.flatMap(u => u.vocabulary).concat(data.review.vocabulary);
+  if (unitId === 'review') return data.review.vocabulary;
+  const u = data.units.find(u => u.id == unitId);
+  return u ? u.vocabulary : [];
+}
+
+function loadCards(onlyWrong = false) {
+  let words;
+  if (modeParam === 'wrong' && !onlyWrong) {
+    // 专练错题模式：从 review.html 传来的错题列表
+    const wrongIds = JSON.parse(localStorage.getItem('practiceWrongList') || '[]');
+    const allWords = data.units.flatMap(u => u.vocabulary).concat(data.review.vocabulary);
+    words = wrongIds.length
+      ? allWords.filter(v => wrongIds.includes(v.word))
+      : allWords.filter(v => (progress[v.word] || 0) < 0);
+  } else {
+    words = getWords(selectedUnit);
+  }
+  if (onlyWrong) {
+    queue = wrongCards.length ? [...wrongCards] : words;
+  } else {
+    queue = shuffle([...words]);
+  }
+  current = 0; rightCount = 0; wrongCount = 0; wrongCards = [];
+  isFlipped = false;
+
+  document.getElementById('fcMain').classList.remove('hidden');
+  document.getElementById('finishScreen').classList.remove('show');
+
+  buildDots();
+  showCard();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildDots() {
+  const dots = document.getElementById('progressDots');
+  dots.innerHTML = '';
+  queue.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.id = `dot-${i}`;
+    dots.appendChild(d);
+  });
+}
+
+function showCard() {
+  if (current >= queue.length) { showFinish(); return; }
+  const v = queue[current];
+  document.getElementById('cardWord').textContent = v.word;
+  document.getElementById('cardChinese').textContent = v.chinese;
+  document.getElementById('remaining').textContent = queue.length - current;
+  document.getElementById('rightCount').textContent = rightCount;
+  document.getElementById('wrongCount').textContent = wrongCount;
+
+  // 取一个例句
+  const allSentences = data.units.flatMap(u => u.sentences || []);
+  const ex = allSentences.find(s => s.en.toLowerCase().includes(v.word.toLowerCase()));
+  document.getElementById('cardExample').textContent = ex ? ex.en : '';
+
+  // 重置翻转
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+  if (isFlipped) speakCurrent();
+}
+
+function markCard(correct) {
+  const v = queue[current];
+  const dot = document.getElementById(`dot-${current}`);
+
+  if (correct) {
+    rightCount++;
+    progress[v.word] = (progress[v.word] || 0) + 1;
+    if (dot) { dot.classList.add('seen', 'right'); }
+  } else {
+    wrongCount++;
+    progress[v.word] = (progress[v.word] || 0) - 1;
+    wrongCards.push(v);
+    if (dot) { dot.classList.add('seen', 'wrong'); }
+  }
+
+  localStorage.setItem('progress', JSON.stringify(progress));
+  current++;
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  showCard();
+}
+
+function speakCurrent() {
+  const word = queue[current]?.word;
+  if (!word) return;
+  const utter = new SpeechSynthesisUtterance(word);
+  utter.lang = 'en-US'; utter.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+function showFinish() {
+  document.getElementById('fcMain').classList.add('hidden');
+  const fs = document.getElementById('finishScreen');
+  fs.classList.add('show');
+
+  const pct = Math.round(rightCount / (rightCount + wrongCount) * 100) || 0;
+  document.getElementById('finishEmoji').textContent = pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪';
+  document.getElementById('finishTitle').textContent = pct >= 80 ? '太棒了！' : pct >= 60 ? '不错哦！' : '继续加油！';
+  document.getElementById('finishSub').textContent =
+    `认识 ${rightCount} 个，不认识 ${wrongCount} 个（正确率 ${pct}%）`;
+  document.getElementById('retryBtn').style.display = wrongCards.length ? '' : 'none';
+}
+
+function restartWrong() { loadCards(true); }
+function resetAndRestart() { loadCards(false); }
+
+buildUnitSelector();
+loadCards();
+</script>
+</body>
+</html>

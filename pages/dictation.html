@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>听写练习</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../data/content.js"></script>
+  <style>
+    .dict-page { padding: 16px 20px; max-width: 480px; margin: 0 auto; }
+    .unit-selector { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:16px; }
+    .unit-selector::-webkit-scrollbar { display:none; }
+    .unit-pill { flex-shrink:0; padding:7px 16px; border-radius:20px; border:2px solid #eee; background:white; font-size:13px; cursor:pointer; font-weight:600; }
+    .unit-pill.active { border-color:var(--primary); background:var(--primary); color:white; }
+
+    .score-bar { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
+    .score-item { text-align:center; }
+    .score-num { font-size:24px; font-weight:700; }
+    .score-lbl { font-size:11px; color:#888; }
+
+    .dict-card {
+      background: white; border-radius: 20px;
+      padding: 24px; box-shadow: var(--shadow);
+      text-align: center; margin-bottom: 20px;
+    }
+    .dict-progress { font-size:13px; color:#888; margin-bottom:16px; }
+
+    .play-area { margin-bottom: 20px; }
+    .play-btn {
+      width: 100%; height: 90px;
+      background: linear-gradient(135deg, #4A90D9, #7B68EE);
+      color: white; border: none; border-radius: 18px;
+      font-size: 36px; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(74,144,217,0.3);
+      transition: transform 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+    }
+    .play-btn span { font-size: 16px; font-weight: 600; }
+    .play-btn:active { transform: scale(0.97); }
+    .play-btn.speaking { animation: glow 0.7s infinite alternate; }
+    @keyframes glow {
+      from { box-shadow: 0 8px 24px rgba(74,144,217,0.3); }
+      to   { box-shadow: 0 8px 40px rgba(74,144,217,0.65); }
+    }
+
+    .play-sub { font-size: 12px; color: #aaa; text-align: center; margin-top: 8px; }
+
+    /* 隐藏提示切换 */
+    .hint-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 13px; color: #888; margin-bottom: 16px; cursor: pointer;
+    }
+    .hint-toggle input { width: 16px; height: 16px; }
+
+    .hint-letters {
+      display: flex; gap: 5px; justify-content: center;
+      flex-wrap: wrap; margin-bottom: 16px;
+      min-height: 24px;
+    }
+    .hint-char {
+      font-size: 20px; font-weight: 700; color: #ddd;
+      width: 20px; text-align: center;
+    }
+    .hint-char.show { color: #ccc; }
+
+    /* 键盘 */
+    .keyboard { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .key-row { display:flex; gap:5px; justify-content:center; }
+    .key {
+      flex:0 0 auto; width:calc((100% - 90px)/10);
+      min-width:28px; max-width:38px; height:44px;
+      background:white; border:1px solid #ddd; border-radius:8px;
+      font-size:16px; font-weight:600; cursor:pointer;
+      box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    }
+    .key:active { background:#eee; transform:scale(0.9); }
+    .key-del { width:52px; max-width:52px; background:#FF6B6B; color:white; font-size:18px; }
+
+    .blanks-row { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+    .blank-letter {
+      width:36px; height:44px; border-bottom:3px solid #ddd;
+      font-size:22px; font-weight:700; text-align:center; line-height:44px;
+    }
+    .blank-letter.filled { border-bottom-color:var(--primary); color:var(--primary); }
+    .blank-letter.correct { border-bottom-color:#2ED573; color:#2ED573; }
+    .blank-letter.wrong-letter { border-bottom-color:#FF4757; color:#FF4757; }
+
+    .result-banner { border-radius:14px; padding:12px 16px; text-align:center; font-size:15px; font-weight:600; margin-bottom:14px; display:none; }
+    .result-banner.ok { background:#E5FFE9; color:#2ED573; display:block; }
+    .result-banner.bad { background:#FFE5E5; color:#FF4757; display:block; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="../index.html">‹</a>
+  <h1>听写练习</h1>
+</div>
+
+<div class="dict-page">
+  <div class="unit-selector" id="unitSelector"></div>
+
+  <div class="score-bar">
+    <div class="score-item"><div class="score-num" id="sRight" style="color:#2ED573">0</div><div class="score-lbl">正确</div></div>
+    <div class="score-item"><div class="score-num" id="sWrong" style="color:#FF4757">0</div><div class="score-lbl">错误</div></div>
+    <div class="score-item"><div class="score-num" id="sLeft" style="color:#4A90D9">0</div><div class="score-lbl">剩余</div></div>
+  </div>
+
+  <div class="play-area">
+    <button class="play-btn" id="playBtn" onclick="playWord()">
+      🔊 <span>点击听单词</span>
+    </button>
+    <div class="play-sub">可以点多次，仔细听清楚再写</div>
+  </div>
+
+  <label class="hint-toggle">
+    <input type="checkbox" id="hintCheck" onchange="toggleHint()"> 显示首字母提示
+  </label>
+  <div class="hint-letters" id="hintLetters"></div>
+
+  <div class="blanks-row" id="blanksRow"></div>
+
+  <div class="keyboard">
+    <div class="key-row" id="kr1"></div>
+    <div class="key-row" id="kr2"></div>
+    <div class="key-row" id="kr3"></div>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+  <button class="btn-primary" id="nextBtn" style="display:none" onclick="nextWord()">下一题 →</button>
+</div>
+
+<script>
+const ROWS = [
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['a','s','d','f','g','h','j','k','l'],
+  ['z','x','c','v','b','n','m','⌫']
+];
+ROWS.forEach((row, i) => {
+  const rowEl = document.getElementById(`kr${i+1}`);
+  row.forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'key' + (k==='⌫'?' key-del':'');
+    btn.textContent = k;
+    btn.onclick = () => pressKey(k);
+    rowEl.appendChild(btn);
+  });
+});
+
+const params = new URLSearchParams(location.search);
+const unitParam = params.get('unit');
+const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
+if (!data) location.href = '../index.html';
+
+let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+let queue = [], current = 0, typed = '', answered = false;
+let rightCount = 0, wrongCount = 0;
+let selectedUnit = unitParam || 'all';
+let showHint = false;
+
+function buildUnitSelector() {
+  const sel = document.getElementById('unitSelector');
+  sel.innerHTML = '';
+  [{ label:'全部', id:'all' }, ...data.units.map(u=>({label:`U${u.id}`,id:u.id})), {label:'Rev',id:'review'}]
+    .forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'unit-pill' + (selectedUnit==item.id?' active':'');
+      btn.textContent = item.label;
+      btn.onclick = () => { selectedUnit=item.id; buildUnitSelector(); loadWords(); };
+      sel.appendChild(btn);
+    });
+}
+
+function getWords() {
+  if (selectedUnit==='all') return data.units.flatMap(u=>u.vocabulary).concat(data.review.vocabulary);
+  if (selectedUnit==='review') return data.review.vocabulary;
+  const u = data.units.find(u=>u.id==selectedUnit);
+  return u ? u.vocabulary : [];
+}
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function loadWords() {
+  queue = shuffle([...getWords()]);
+  current=0; rightCount=0; wrongCount=0;
+  updateScores();
+  nextWord();
+}
+
+function nextWord() {
+  if (current >= queue.length) { showComplete(); return; }
+  typed=''; answered=false;
+  document.getElementById('resultBanner').className='result-banner';
+  document.getElementById('nextBtn').style.display='none';
+  renderBlanks('');
+  renderHint();
+  updateScores();
+  // 自动播放
+  setTimeout(playWord, 400);
+}
+
+function playWord() {
+  const v = queue[current];
+  if (!v) return;
+  const btn = document.getElementById('playBtn');
+  btn.classList.add('speaking');
+  const u = new SpeechSynthesisUtterance(v.word);
+  u.lang='en-US'; u.rate=0.75;
+  u.onend = () => btn.classList.remove('speaking');
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+function renderBlanks(input, state) {
+  const word = queue[current]?.word || '';
+  const container = document.getElementById('blanksRow');
+  container.innerHTML = '';
+  for (let i=0; i<word.length; i++) {
+    const div = document.createElement('div');
+    div.className = 'blank-letter';
+    if (input[i]) {
+      div.textContent = input[i];
+      if (state==='correct') div.classList.add('correct');
+      else if (state==='wrong') div.classList.add('wrong-letter');
+      else div.classList.add('filled');
+    }
+    container.appendChild(div);
+  }
+}
+
+function renderHint() {
+  const word = queue[current]?.word || '';
+  const container = document.getElementById('hintLetters');
+  container.innerHTML = '';
+  word.split('').forEach((ch, i) => {
+    const span = document.createElement('div');
+    span.className = 'hint-char' + (showHint && i===0 ? ' show' : '');
+    span.textContent = (showHint && i===0) ? ch : '_';
+    container.appendChild(span);
+  });
+}
+
+function toggleHint() {
+  showHint = document.getElementById('hintCheck').checked;
+  renderHint();
+}
+
+function pressKey(k) {
+  if (answered) return;
+  const v = queue[current];
+  if (k==='⌫') { typed=typed.slice(0,-1); renderBlanks(typed); return; }
+  if (typed.length >= v.word.length) return;
+  typed += k;
+  renderBlanks(typed);
+  if (typed.length === v.word.length) checkAnswer();
+}
+
+function checkAnswer() {
+  const v = queue[current];
+  const correct = typed.toLowerCase() === v.word.toLowerCase();
+  answered = true;
+
+  const banner = document.getElementById('resultBanner');
+  if (correct) {
+    rightCount++;
+    progress[v.word] = (progress[v.word]||0)+1;
+    renderBlanks(typed,'correct');
+    banner.textContent='✅ 写对了！';
+    banner.className='result-banner ok';
+    setTimeout(() => { current++; nextWord(); }, 1200);
+  } else {
+    wrongCount++;
+    progress[v.word] = (progress[v.word]||0)-1;
+    renderBlanks(typed,'wrong');
+    banner.innerHTML=`❌ 正确拼写：<b>${v.word}</b>（${v.chinese}）`;
+    banner.className='result-banner bad';
+    // 再播一遍正确答案
+    setTimeout(playWord, 500);
+    document.getElementById('nextBtn').style.display='block';
+  }
+
+  localStorage.setItem('progress', JSON.stringify(progress));
+  updateScores();
+}
+
+function updateScores() {
+  document.getElementById('sRight').textContent = rightCount;
+  document.getElementById('sWrong').textContent = wrongCount;
+  document.getElementById('sLeft').textContent = Math.max(0, queue.length-current);
+}
+
+function showComplete() {
+  const pct = Math.round(rightCount/(rightCount+wrongCount||1)*100);
+  document.querySelector('.play-area').innerHTML = `
+    <div style="text-align:center;padding:20px">
+      <div style="font-size:52px">${pct>=80?'🌟':pct>=60?'👍':'💪'}</div>
+      <div style="font-size:20px;font-weight:700;margin:8px 0">听写完成！</div>
+      <div style="font-size:14px;color:#888">正确 ${rightCount} / 错误 ${wrongCount}（${pct}%）</div>
+    </div>`;
+  document.getElementById('blanksRow').innerHTML='';
+  document.getElementById('hintLetters').innerHTML='';
+  document.getElementById('resultBanner').className='result-banner';
+  document.getElementById('nextBtn').style.display='block';
+  document.getElementById('nextBtn').textContent='再来一次 🔄';
+  document.getElementById('nextBtn').onclick=loadWords;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Backspace') pressKey('⌫');
+  else if (e.key==='Enter' && answered) { current++; nextWord(); }
+  else if (/^[a-zA-Z]$/.test(e.key)) pressKey(e.key.toLowerCase());
+});
+
+buildUnitSelector();
+loadWords();
+</script>
+</body>
+</html>

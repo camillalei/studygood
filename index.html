@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>五年级英语上册</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="data/content.js"></script>
+</head>
+<body>
+
+<div class="home-header">
+  <h1>五年级英语上册</h1>
+  <p>广州版 · 7个单元 · 共 <span id="totalWords">0</span> 个单词</p>
+</div>
+
+<div class="home-stats">
+  <div class="stat-item">
+    <div class="stat-num" id="learnedCount">0</div>
+    <div class="stat-label">已掌握</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="wrongCount">0</div>
+    <div class="stat-label">待复习</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="streakCount">0</div>
+    <div class="stat-label">连续天数</div>
+  </div>
+</div>
+
+<div class="section-title">学习模式</div>
+<div class="mode-grid">
+  <button class="mode-card" onclick="location.href='pages/flashcard.html'">
+    <div class="icon">🃏</div>
+    <div class="name">单词闪卡</div>
+    <div class="desc">翻转记忆</div>
+  </button>
+  <button class="mode-card" onclick="location.href='pages/spell.html'">
+    <div class="icon">✏️</div>
+    <div class="name">拼写测试</div>
+    <div class="desc">看中文写英文</div>
+  </button>
+  <button class="mode-card" onclick="location.href='pages/dictation.html'">
+    <div class="icon">🎧</div>
+    <div class="name">听写练习</div>
+    <div class="desc">听音写单词</div>
+  </button>
+  <button class="mode-card" onclick="location.href='pages/sentences.html'">
+    <div class="icon">💬</div>
+    <div class="name">句型学习</div>
+    <div class="desc">核心句式</div>
+  </button>
+</div>
+
+<div class="mode-grid" style="padding-top:0">
+  <button class="mode-card" onclick="location.href='pages/review.html'" style="grid-column: 1/-1">
+    <div class="icon">📝</div>
+    <div class="name">错题本</div>
+    <div class="desc">专项复习做错的单词</div>
+  </button>
+</div>
+
+<div class="section-title">选择单元</div>
+<div class="unit-list" id="unitList"></div>
+
+<script>
+let data = null;
+
+async function init() {
+  data = window.ENGLISH_DATA;
+  localStorage.setItem('englishData', JSON.stringify(data));
+
+  const allWords = data.units.flatMap(u => u.vocabulary).concat(data.review.vocabulary);
+  document.getElementById('totalWords').textContent = allWords.length;
+
+  const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+  const learned = Object.values(progress).filter(v => v >= 3).length;
+  const wrong = Object.values(progress).filter(v => v < 0).length;
+
+  document.getElementById('learnedCount').textContent = learned;
+  document.getElementById('wrongCount').textContent = wrong;
+
+  // 连续天数
+  const streak = getStreak();
+  document.getElementById('streakCount').textContent = streak;
+
+  const list = document.getElementById('unitList');
+  data.units.forEach(unit => {
+    const total = unit.vocabulary.length;
+    const done = unit.vocabulary.filter(v => (progress[v.word] || 0) >= 3).length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+
+    const el = document.createElement('button');
+    el.className = 'unit-card';
+    el.onclick = () => location.href = `pages/unit.html?id=${unit.id}`;
+    el.innerHTML = `
+      <div class="unit-badge" style="background:${unit.color}">${unit.id}</div>
+      <div class="unit-info">
+        <div class="title">${unit.title}</div>
+        <div class="sub">${unit.theme} · ${total}个单词</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${unit.color}"></div></div>
+      </div>
+      <div class="unit-arrow">›</div>
+    `;
+    list.appendChild(el);
+  });
+
+  // Review unit
+  const rev = data.review;
+  const total = rev.vocabulary.length;
+  const done = rev.vocabulary.filter(v => (progress[v.word] || 0) >= 3).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const el = document.createElement('button');
+  el.className = 'unit-card';
+  el.onclick = () => location.href = `pages/unit.html?id=review`;
+  el.innerHTML = `
+    <div class="unit-badge" style="background:${rev.color}">R</div>
+    <div class="unit-info">
+      <div class="title">${rev.title}</div>
+      <div class="sub">${rev.theme} · ${total}个单词</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${rev.color}"></div></div>
+    </div>
+    <div class="unit-arrow">›</div>
+  `;
+  list.appendChild(el);
+}
+
+function getStreak() {
+  const today = new Date().toDateString();
+  const days = JSON.parse(localStorage.getItem('studyDays') || '[]');
+  if (!days.includes(today)) {
+    days.push(today);
+    localStorage.setItem('studyDays', JSON.stringify(days));
+  }
+  let streak = 0;
+  let d = new Date();
+  while (true) {
+    if (days.includes(d.toDateString())) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+
+init();
+</script>
+</body>
+</html>

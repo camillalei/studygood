@@ -1,0 +1,465 @@
+{
+  "title": "广州版五年级上册英语",
+  "units": [
+    {
+      "id": 1,
+      "title": "How Do You Learn English?",
+      "theme": "学习方法",
+      "color": "#FF6B6B",
+      "vocabulary": [
+        { "word": "read", "chinese": "朗读；阅读", "bold": false },
+        { "word": "loud", "chinese": "大声的；喧闹的", "bold": false },
+        { "word": "sentence", "chinese": "句子", "bold": false },
+        { "word": "anything", "chinese": "任何事", "bold": false },
+        { "word": "fall", "chinese": "摔落；秋天", "bold": false },
+        { "word": "something", "chinese": "某事；某物", "bold": false },
+        { "word": "kid", "chinese": "小孩", "bold": false },
+        { "word": "bedroom", "chinese": "卧室", "bold": false },
+        { "word": "worry", "chinese": "担心", "bold": false },
+        { "word": "few", "chinese": "有些；很少", "bold": false },
+        { "word": "find", "chinese": "找到；发现", "bold": false }
+      ],
+      "sentences": [
+        { "en": "How do you learn English words?", "zh": "你怎么学英语单词？" },
+        { "en": "I like to learn words in chunks.", "zh": "我喜欢把单词放在短语中学习。" },
+        { "en": "I find it useful to make word cards.", "zh": "我觉得制作单词卡很有用。" },
+        { "en": "It helps me to remember words.", "zh": "它帮助我记住单词。" },
+        { "en": "Every time I ..., I ...", "zh": "每次我……，我就……" },
+        { "en": "What should I do?", "zh": "我该怎么做？" }
+      ],
+      "chunks": [
+        { "en": "learn words in chunks", "zh": "把单词放在词组里学习" },
+        { "en": "make word cards", "zh": "制作单词卡片" },
+        { "en": "find it useful", "zh": "觉得……有用" },
+        { "en": "cheer yourself up", "zh": "给自己加油打气" }
+      ],
+      "dialogues": [
+        { "speaker": "Lucas", "en": "Nikki, how do you learn new words?", "zh": "妮基，你是怎么学新单词的？" },
+        { "speaker": "Nikki", "en": "I like to learn words in chunks.", "zh": "我喜欢把单词放在词组里学习。" },
+        { "speaker": "Lucas", "en": "What is a chunk?", "zh": "什么是词组？" },
+        { "speaker": "Nikki", "en": "It's a group of words, like \"join a club\". It helps you remember words more easily.", "zh": "它是一组单词，比如「join a club」。它能帮助你更容易记住单词。" },
+        { "speaker": "Lucas", "en": "Sounds fun! I'm going to try it at home. Thanks, Nikki!", "zh": "听起来很有趣！我要回家试试。谢谢你，妮基！" }
+      ],
+      "reading": {
+        "title": "Unit 1 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: Here are some ways to remember words faster.",
+          "learn words in chunks",
+          "use pictures",
+          "give me a hand",
+          "look them up in the dictionary",
+          "practise with others",
+          "read them out loud",
+          "## Close Reading",
+          "Is learning new words hard? Try these tips.",
+          "1. Learn words in chunks — Chunks help you remember words more easily. For example, remember \"strong wind\" instead of just \"wind\". You can also make word cards with pictures.",
+          "2. Put chunks together to make sentences — Try to use chunks in your speaking and writing. For example, \"Can you please turn on the lights?\"",
+          "3. Learn a little every day — Spend ten to twenty minutes reading English books every day. Keep your word cards with you and look at them often."
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "title": "What Club Are You Going to Join?",
+      "theme": "加入俱乐部",
+      "color": "#4ECDC4",
+      "vocabulary": [
+        { "word": "science", "chinese": "科学", "bold": false },
+        { "word": "fair", "chinese": "(活动)集市；公平的", "bold": false },
+        { "word": "skill", "chinese": "技能", "bold": false },
+        { "word": "chance", "chinese": "机会", "bold": false },
+        { "word": "become", "chinese": "成为；变得", "bold": false },
+        { "word": "robot", "chinese": "机器人", "bold": false },
+        { "word": "mind", "chinese": "头脑", "bold": false },
+        { "word": "wear", "chinese": "穿", "bold": false },
+        { "word": "advice", "chinese": "建议", "bold": false },
+        { "word": "besides", "chinese": "此外", "bold": false },
+        { "word": "interesting", "chinese": "有趣的", "bold": false },
+        { "word": "seem", "chinese": "似乎，好像", "bold": false },
+        { "word": "front", "chinese": "前面；正面", "bold": false },
+        { "word": "win", "chinese": "赢得；获胜", "bold": false }
+      ],
+      "sentences": [
+        { "en": "Which club are you going to join?", "zh": "你打算加入哪个俱乐部？" },
+        { "en": "I'm going to join the football club.", "zh": "我打算加入足球俱乐部。" },
+        { "en": "It can help me grow taller and stronger.", "zh": "它能帮助我长得更高更强壮。" },
+        { "en": "Are you going to join a club?", "zh": "你打算加入俱乐部吗？" },
+        { "en": "Yes, I am. / No, I'm not.", "zh": "是的，我打算。/ 不，我不打算。" }
+      ],
+      "chunks": [
+        { "en": "grow taller and stronger", "zh": "长得更高更强壮" },
+        { "en": "help with your writing", "zh": "帮助写作" },
+        { "en": "speak more clearly", "zh": "说话更清晰" },
+        { "en": "make new friends", "zh": "结交新朋友" },
+        { "en": "share your ideas", "zh": "分享你的想法" },
+        { "en": "learn thinking skills", "zh": "学习思维技能" }
+      ],
+      "dialogues": [
+        { "speaker": "Sam", "en": "Hey, Aiwen! The club fair is coming!", "zh": "嘿，艾文！社团博览会快来了！" },
+        { "speaker": "Aiwen", "en": "Yeah! Which club are you going to join?", "zh": "是啊！你打算加入哪个社团？" },
+        { "speaker": "Sam", "en": "I'm going to join the football club. It can help me grow taller and stronger. What about you?", "zh": "我打算加入足球俱乐部。它能帮助我长得更高更强壮。你呢？" },
+        { "speaker": "Aiwen", "en": "I am going to join the science club.", "zh": "我打算加入科学俱乐部。" },
+        { "speaker": "Sam", "en": "That's great!", "zh": "太棒了！" }
+      ],
+      "reading": {
+        "title": "Unit 2 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: The club fair is coming! What are Sam's thoughts about the clubs?",
+          "try new things",
+          "make more friends",
+          "share my ideas",
+          "have better writing and speaking skills",
+          "grow taller and stronger",
+          "## Close Reading",
+          "Speech Club: We give you a new way to share your ideas and a chance to become a great speaker. Come on time and speak up! Wed. 4:00 – 5:00 p.m.",
+          "AI and Robots Club: Are you interested in AI and robots? Do you like trying new things? Join us and have great fun! Just bring an open mind. Tue. & Thurs. 3:40 – 5:00 p.m.",
+          "Football Club: Do you want to run faster and get stronger? Join our team and make new friends! Mon., Wed., & Fri. after school. Please wear sports shoes.",
+          "Dance Club: Do you want to learn how to tell a story with your body? This is the right place! Mon. & Wed. 3:00 – 5:00 p.m. Please bring your dance shoes and clothes."
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "title": "Best Friends Forever",
+      "theme": "友情与关怀",
+      "color": "#45B7D1",
+      "vocabulary": [
+        { "word": "ill", "chinese": "生病的", "bold": false },
+        { "word": "bad", "chinese": "糟糕的；坏的", "bold": false },
+        { "word": "pet", "chinese": "宠物", "bold": false },
+        { "word": "wrong", "chinese": "错误的", "bold": false },
+        { "word": "miss", "chinese": "想念；错过", "bold": false },
+        { "word": "hometown", "chinese": "家乡", "bold": false },
+        { "word": "sad", "chinese": "悲伤的；难过的", "bold": false },
+        { "word": "lose", "chinese": "输掉", "bold": false },
+        { "word": "believe", "chinese": "相信；认为", "bold": false },
+        { "word": "grade", "chinese": "成绩；年级", "bold": false },
+        { "word": "difficult", "chinese": "困难的", "bold": false },
+        { "word": "study", "chinese": "学习", "bold": false },
+        { "word": "understanding", "chinese": "理解", "bold": false },
+        { "word": "space", "chinese": "空间；太空", "bold": false },
+        { "word": "hurt", "chinese": "伤害；受伤", "bold": false },
+        { "word": "very", "chinese": "非常", "bold": false }
+      ],
+      "sentences": [
+        { "en": "What's wrong?", "zh": "怎么了？" },
+        { "en": "How are you feeling now?", "zh": "你现在感觉怎么样？" },
+        { "en": "Cheer up! Be happy!", "zh": "振作起来！开心点！" },
+        { "en": "I'm here for you.", "zh": "我在这里陪着你。" },
+        { "en": "I'm sorry to hear that.", "zh": "听到这个我很遗憾。" },
+        { "en": "It's no big deal.", "zh": "没什么大不了的。" },
+        { "en": "Do you want to talk about it?", "zh": "你想聊聊吗？" },
+        { "en": "Are you feeling better now?", "zh": "你现在感觉好一些了吗？" }
+      ],
+      "chunks": [
+        { "en": "cheer up", "zh": "振作起来" },
+        { "en": "I'm here for you", "zh": "我在这里陪着你" },
+        { "en": "That must be hard", "zh": "那一定很难受" },
+        { "en": "Just go and get some food", "zh": "去吃点东西吧" },
+        { "en": "I know how you feel", "zh": "我理解你的感受" }
+      ],
+      "dialogues": [
+        { "speaker": "Yafei", "en": "Hey, Sam. You look sad.", "zh": "嘿，山姆。你看起来很难过。" },
+        { "speaker": "Sam", "en": "We lost the game today.", "zh": "我们今天输了比赛。" },
+        { "speaker": "Yafei", "en": "I'm sorry to hear that. I know how you feel.", "zh": "很遗憾听到这个消息。我理解你的感受。" },
+        { "speaker": "Sam", "en": "I can't believe it. We played so well.", "zh": "我不敢相信。我们打得那么好。" },
+        { "speaker": "Yafei", "en": "That must be hard. How about we get something to eat?", "zh": "那一定很难受。我们去吃点东西怎么样？" },
+        { "speaker": "Sam", "en": "OK.", "zh": "好的。" }
+      ],
+      "reading": {
+        "title": "Unit 3 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: When your friends are down, what do you say to them?",
+          "That must be hard.",
+          "How are you feeling now? Do you want to talk about it?",
+          "What's wrong? I'm here if you want to talk.",
+          "Is everything all right?",
+          "I know how you feel.",
+          "It's okay to feel sad.",
+          "## Close Reading",
+          "## Scene 1",
+          "Lucas: You are sad again, Alice?",
+          "Alice: Chinese is so difficult. I want to give up.",
+          "Lucas: How can you think it's hard? It's not!",
+          "Alice: Maybe I'm just bad at it.",
+          "Lucas: You worry too much. It's not a big deal!",
+          "Alice: If you say so.",
+          "## Scene 2",
+          "Mulan: Alice, you look sad. Do you want to talk?",
+          "Alice: Chinese is so difficult. I want to give up.",
+          "Mulan: I have a hard time learning English. I know how you feel.",
+          "Alice: I just keep forgetting words.",
+          "Mulan: Me, too! We can study together. I can teach you Chinese, and you can teach me English.",
+          "Alice: Sounds good! Thanks, Mulan! I feel better now."
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "title": "Here Comes a Typhoon!",
+      "theme": "台风天气安全",
+      "color": "#96CEB4",
+      "vocabulary": [
+        { "word": "heavy", "chinese": "严重的；沉的", "bold": false },
+        { "word": "bring", "chinese": "带来", "bold": false },
+        { "word": "inside", "chinese": "在里面", "bold": false },
+        { "word": "report", "chinese": "报道", "bold": false },
+        { "word": "follow", "chinese": "遵循；跟随", "bold": false },
+        { "word": "happen", "chinese": "碰巧；发生", "bold": false },
+        { "word": "outside", "chinese": "在外面", "bold": false },
+        { "word": "safe", "chinese": "安全的", "bold": false },
+        { "word": "usually", "chinese": "通常", "bold": false },
+        { "word": "land", "chinese": "登陆；土地", "bold": false }
+      ],
+      "sentences": [
+        { "en": "A typhoon will come on Friday.", "zh": "台风将于周五到来。" },
+        { "en": "I'll turn off the lights.", "zh": "我会关灯。" },
+        { "en": "You'll need to close the windows.", "zh": "你需要关上窗户。" },
+        { "en": "Please remember to stay indoors.", "zh": "请记得待在室内。" },
+        { "en": "Make sure you bring everything inside.", "zh": "确保把所有东西搬到室内。" },
+        { "en": "If you happen to be outside, ...", "zh": "如果你碰巧在外面，……" },
+        { "en": "You'll want to find a safe place.", "zh": "你会想找一个安全的地方。" }
+      ],
+      "chunks": [
+        { "en": "turn off the lights", "zh": "关灯" },
+        { "en": "close the windows", "zh": "关上窗户" },
+        { "en": "stay indoors", "zh": "待在室内" },
+        { "en": "bring everything inside", "zh": "把所有东西搬进室内" },
+        { "en": "keep safe", "zh": "保持安全" }
+      ],
+      "dialogues": [
+        { "speaker": "Nikki", "en": "A typhoon is coming tomorrow!", "zh": "明天有台风要来了！" },
+        { "speaker": "Yafei", "en": "Don't worry. Just close the windows to keep out the strong wind.", "zh": "别担心。只需关上窗户挡住大风。" },
+        { "speaker": "Nikki", "en": "Okay. Anything else I should do?", "zh": "好的。还有什么我该做的吗？" },
+        { "speaker": "Yafei", "en": "You'll also need to turn off the lights. Oh! Don't forget to bring everything inside.", "zh": "你还需要关掉电灯。哦！别忘了把所有东西都搬进来。" },
+        { "speaker": "Nikki", "en": "Thanks! I'll keep that in mind.", "zh": "谢谢！我会记住的。" }
+      ],
+      "reading": {
+        "title": "Unit 4 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: A typhoon is coming. What should you do?",
+          "stay away from trees",
+          "turn off the lights",
+          "close the windows",
+          "wear a colourful raincoat",
+          "bring everything inside",
+          "watch your step",
+          "## Close Reading",
+          "Good morning, everyone! Welcome to today's weather report. Typhoon Haitang is coming on Saturday afternoon. Please follow these tips.",
+          "During a typhoon, try to stay indoors. Bring everything inside, and close your windows. Also, turn off your lights and TV.",
+          "If you happen to be outside, get to a safe place quickly. Stay away from trees! Watch your step and don't run. Wear a colourful raincoat so others can see you. Remember, a raincoat is better than an umbrella.",
+          "Keep safe! See you tomorrow!"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "title": "What Will the Weather Be Like?",
+      "theme": "天气与服装",
+      "color": "#FFEAA7",
+      "vocabulary": [
+        { "word": "low", "chinese": "低的", "bold": false },
+        { "word": "high", "chinese": "高的", "bold": false },
+        { "word": "below", "chinese": "低于；在……下面", "bold": false },
+        { "word": "degree", "chinese": "度数", "bold": false },
+        { "word": "cap", "chinese": "帽子", "bold": false },
+        { "word": "skirt", "chinese": "裙子", "bold": false },
+        { "word": "shorts", "chinese": "短裤", "bold": false },
+        { "word": "cloudy", "chinese": "多云的", "bold": false },
+        { "word": "temperature", "chinese": "温度", "bold": false },
+        { "word": "hat", "chinese": "帽子", "bold": false },
+        { "word": "scarf", "chinese": "围巾", "bold": false },
+        { "word": "sunny", "chinese": "晴朗的", "bold": false },
+        { "word": "may", "chinese": "可以；可能", "bold": false },
+        { "word": "photo", "chinese": "照片", "bold": false },
+        { "word": "ride", "chinese": "旅途；骑", "bold": false }
+      ],
+      "sentences": [
+        { "en": "Will it be sunny tomorrow?", "zh": "明天会晴天吗？" },
+        { "en": "Yes, it will. / No, it won't.", "zh": "是的，会的。/ 不，不会的。" },
+        { "en": "Will I need winter trousers?", "zh": "我需要穿冬裤吗？" },
+        { "en": "It will be windy tomorrow.", "zh": "明天会有风。" },
+        { "en": "The temperature will be high/low.", "zh": "气温会高/低。" },
+        { "en": "Hello, this is ... May I speak to ...?", "zh": "你好，我是……我可以找……吗？" }
+      ],
+      "chunks": [
+        { "en": "a pair of jeans", "zh": "一条牛仔裤" },
+        { "en": "a pair of shorts", "zh": "一条短裤" },
+        { "en": "a pair of shoes", "zh": "一双鞋" },
+        { "en": "a pair of socks", "zh": "一双袜子" },
+        { "en": "winter trousers", "zh": "冬裤" },
+        { "en": "T-shirt", "zh": "T恤" },
+        { "en": "sweater", "zh": "毛衣" },
+        { "en": "coat", "zh": "外套" }
+      ],
+      "dialogues": [
+        { "speaker": "Mum", "en": "Lucas, how's your packing going?", "zh": "卢卡斯，你收拾行李收拾得怎么样了？" },
+        { "speaker": "Lucas", "en": "It's getting cold in Harbin. Will I need to pack a lot of clothes?", "zh": "哈尔滨很冷。我需要带很多衣服吗？" },
+        { "speaker": "Mum", "en": "One warm coat and some winter trousers will do. You'll also need some light sweaters and a pair of warm shoes.", "zh": "一件厚外套和几条冬裤就够了。你还需要带几件薄毛衣和一双保暖的鞋。" },
+        { "speaker": "Lucas", "en": "OK. I'll also need some socks.", "zh": "好的。我还需要带一些袜子。" }
+      ],
+      "reading": {
+        "title": "Unit 5 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: We wear different clothes in different weather.",
+          "−10°C (ten degrees below zero): coat, a pair of winter trousers",
+          "10°C to 20°C (ten to twenty degrees): sweater, a pair of jeans",
+          "30°C (thirty degrees): cap, T-shirt, skirt, a pair of shorts",
+          "## Close Reading",
+          "And now for Harbin!",
+          "Friday is going to be a cloudy day. The temperature goes between six below zero and three degrees. Winter trousers and a warm coat will be a must on Friday!",
+          "Strong winds will come on Saturday. The lowest temperature will be ten below zero, and the highest will be three below zero. Bring a winter hat and a scarf to keep warm when you go out.",
+          "Sunday will be a bit warmer and sunny. The highest temperature will be one degree and the lowest seven below zero."
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "title": "What Will You Do in Space?",
+      "theme": "太空旅行",
+      "color": "#DDA0DD",
+      "vocabulary": [
+        { "word": "astronaut", "chinese": "宇航员", "bold": false },
+        { "word": "farm", "chinese": "农场", "bold": false },
+        { "word": "travel", "chinese": "旅行", "bold": false },
+        { "word": "country", "chinese": "国家", "bold": false },
+        { "word": "future", "chinese": "将来的；未来", "bold": false },
+        { "word": "bag", "chinese": "包；袋", "bold": false },
+        { "word": "moon", "chinese": "月亮；月球", "bold": false },
+        { "word": "life", "chinese": "生活；生命", "bold": false },
+        { "word": "Earth", "chinese": "地球", "bold": false },
+        { "word": "hotel", "chinese": "酒店", "bold": false }
+      ],
+      "sentences": [
+        { "en": "What will I do in space?", "zh": "我在太空会做什么？" },
+        { "en": "Where will I stay in space?", "zh": "我在太空住哪里？" },
+        { "en": "How will I eat in space?", "zh": "我在太空怎么吃东西？" },
+        { "en": "When will we travel to space?", "zh": "我们什么时候去太空旅行？" },
+        { "en": "You'll see ...", "zh": "你将会看到……" },
+        { "en": "You'll get to ...", "zh": "你将会到达……" },
+        { "en": "We can ... in ... However, we can't do that in ...", "zh": "我们可以在……做……，但是在……不能。" }
+      ],
+      "chunks": [
+        { "en": "space travel", "zh": "太空旅行" },
+        { "en": "space life", "zh": "太空生活" },
+        { "en": "travel to space", "zh": "去太空旅行" },
+        { "en": "You'll get to ...", "zh": "你将会到达……" },
+        { "en": "You'll see ...", "zh": "你将会看到……" }
+      ],
+      "dialogues": [
+        { "speaker": "Nikki", "en": "Hi, Yiming! What will you do if you can travel to space?", "zh": "嗨，一鸣！如果你能去太空旅行，你会做什么？" },
+        { "speaker": "Yiming", "en": "I would like to try space food! What will you do?", "zh": "我想尝尝太空食品！你会做什么？" },
+        { "speaker": "Nikki", "en": "I'll go on a spacewalk!", "zh": "我会去太空漫步！" },
+        { "speaker": "Yiming", "en": "That sounds cool!", "zh": "听起来很酷！" },
+        { "speaker": "Nikki", "en": "We could also talk to astronauts from other countries.", "zh": "我们还可以和其他国家的宇航员交流。" },
+        { "speaker": "Yiming", "en": "Haha, I will teach them Chinese!", "zh": "哈哈，我会教他们说中文！" }
+      ],
+      "reading": {
+        "title": "Unit 6 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: Do you know what astronauts do in space?",
+          "watch the sunrise",
+          "go on a spacewalk",
+          "work with a space robot",
+          "talk to astronauts",
+          "try space food and drinks",
+          "visit the space farm",
+          "## Close Reading",
+          "Hi there, future space travellers! Ready for your first space trip? There are lots of things to do and see.",
+          "You will eat dried food and drink from bags. And in space, you will sleep in sleeping bags!",
+          "Then, you will work with your space robots and go on spacewalks. We will also show you our space farm. Cool, right?",
+          "By the way, do you like to watch the sunrise? In space, you can watch 16 sunrises every day! You can also see the moon and the stars.",
+          "Come join us in space!"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "title": "Can You Make a Bird Feeder?",
+      "theme": "手工制作",
+      "color": "#F0A500",
+      "vocabulary": [
+        { "word": "draw", "chinese": "画", "bold": false },
+        { "word": "cut", "chinese": "切；割", "bold": false },
+        { "word": "along", "chinese": "沿着", "bold": false },
+        { "word": "feeder", "chinese": "喂食器", "bold": false },
+        { "word": "bottle", "chinese": "瓶子", "bold": false },
+        { "word": "plastic", "chinese": "塑料的", "bold": false },
+        { "word": "hole", "chinese": "洞", "bold": false },
+        { "word": "dry", "chinese": "干燥的", "bold": false },
+        { "word": "windy", "chinese": "多风的", "bold": false },
+        { "word": "glue", "chinese": "粘合；胶水", "bold": false },
+        { "word": "plate", "chinese": "盘子", "bold": false }
+      ],
+      "sentences": [
+        { "en": "He will need to cut along the lines.", "zh": "他需要沿着线剪。" },
+        { "en": "She will place it on a tree.", "zh": "她将把它放在树上。" },
+        { "en": "It'll keep food dry.", "zh": "它会让食物保持干燥。" },
+        { "en": "First, draw cutting lines on the bottle.", "zh": "首先，在瓶子上画出剪切线。" },
+        { "en": "Next, you will need to put some bird food into the bottle.", "zh": "接下来，你需要把一些鸟食放进瓶子里。" },
+        { "en": "Finally, find a tree to place it on.", "zh": "最后，找一棵树把它放上去。" },
+        { "en": "What do you think of this bird feeder?", "zh": "你觉得这个喂鸟器怎么样？" }
+      ],
+      "chunks": [
+        { "en": "draw cutting lines", "zh": "画剪切线" },
+        { "en": "cut along the lines", "zh": "沿线剪" },
+        { "en": "glue bottles together", "zh": "把瓶子粘在一起" },
+        { "en": "draw lines on the bottle", "zh": "在瓶子上画线" },
+        { "en": "glue on the lid", "zh": "在瓶盖上涂胶" }
+      ],
+      "dialogues": [
+        { "speaker": "Nikki", "en": "Hey, Yafei. Can you teach me how to make a bird feeder?", "zh": "嘿，亚飞。你能教我怎么做喂鸟器吗？" },
+        { "speaker": "Yafei", "en": "Sure! First, draw cutting lines on the bottle, and then cut along the lines.", "zh": "当然！首先，在瓶子上画出裁剪线，然后沿线剪开。" },
+        { "speaker": "Nikki", "en": "Okay, what's next?", "zh": "好的，然后呢？" },
+        { "speaker": "Yafei", "en": "Next, you will need to put some bird food into the bottle.", "zh": "接下来，你需要往瓶子里放些鸟食。" },
+        { "speaker": "Nikki", "en": "Okay.", "zh": "好的。" },
+        { "speaker": "Yafei", "en": "Finally, find a tree to place it on.", "zh": "最后，找一棵树把它放上去。" },
+        { "speaker": "Nikki", "en": "Thanks, Yafei.", "zh": "谢谢你，亚飞。" }
+      ],
+      "reading": {
+        "title": "Unit 7 课文",
+        "paragraphs": [
+          "## Get Started",
+          "Task A: It's wintertime. Yafei is going to make a bird feeder. Look and order the steps.",
+          "Step 1: draw cutting lines",
+          "Step 2: cut along the lines",
+          "Step 3: put food inside",
+          "Step 4: place it on a tree",
+          "## Close Reading",
+          "Today, it is not easy for birds to find food. It is even more difficult during cold, snowy winters.",
+          "But you can make a bird feeder to help them. You only need to find a used plastic bottle. Then, cut a hole in the side of the bottle, put some food inside, and place the bottle on a tree. Birds will love your feeder!",
+          "There are different kinds of bird feeders. Some will keep food dry. Others will stay still on windy days or last for weeks. Make your own feeder and place it in a tree. Then, you'll have many new friends!"
+        ]
+      }
+    }
+  ],
+  "review": {
+    "title": "Let's Go Camping!",
+    "theme": "露营复习",
+    "color": "#98D8C8",
+    "vocabulary": [
+      { "word": "hike", "chinese": "远足", "bold": false },
+      { "word": "hill", "chinese": "小山", "bold": false },
+      { "word": "local", "chinese": "当地的", "bold": false },
+      { "word": "camp", "chinese": "露营", "bold": false },
+      { "word": "river", "chinese": "河", "bold": false },
+      { "word": "forest", "chinese": "森林", "bold": false },
+      { "word": "deep", "chinese": "深的", "bold": false },
+      { "word": "bowl", "chinese": "碗；盆", "bold": false },
+      { "word": "rope", "chinese": "绳子", "bold": false },
+      { "word": "pen", "chinese": "钢笔", "bold": false },
+      { "word": "glass", "chinese": "玻璃", "bold": false }
+    ]
+  },
+  "phonics": [
+    { "letter": "q", "words": ["quick", "queen", "quite"] },
+    { "letter": "r", "words": ["red", "run", "rock"] },
+    { "letter": "s", "words": ["sit", "say", "sun"] }
+  ]
+}
