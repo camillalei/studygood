@@ -298,7 +298,7 @@ function checkAnswer() {
       retryCardWord = null;
       showLastResult();
     }
-    progress[v.word] = (progress[v.word]||0)+1;
+    if (!retriedWords.has(v.word)) progress[v.word] = (progress[v.word]||0)+1;
     renderBlanks(typed,'correct');
     banner.textContent='✅ 写对了！';
     banner.className='result-banner ok';

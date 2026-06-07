@@ -288,7 +288,7 @@ function checkAnswer() {
       retryCardWord = null;
       showLastResult();
     }
-    progress[v.word] = (progress[v.word] || 0) + 1;
+    if (!retriedWords.has(v.word)) progress[v.word] = (progress[v.word] || 0) + 1;
     renderBlanks(v.word, typed, 'correct');
     banner.textContent = '✅ 正确！太棒了！';
     banner.className = 'result-banner correct-banner';
