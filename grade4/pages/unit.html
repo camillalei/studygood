@@ -266,7 +266,7 @@
 const params = new URLSearchParams(location.search);
 const unitId = params.get('id');
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
-const progress = JSON.parse(localStorage.getItem('progress') || '{}');
+const progress = JSON.parse(localStorage.getItem('progress_grade4') || '{}');
 
 if (!data) { location.href = '../index.html'; }
 

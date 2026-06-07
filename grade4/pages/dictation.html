@@ -168,7 +168,7 @@ const unitParam = params.get('unit');
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
 if (!data) location.href = '../index.html';
 
-let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+let progress = JSON.parse(localStorage.getItem('progress_grade4') || '{}');
 let queue = [], current = 0, typed = '', answered = false;
 let rightCount = 0, wrongCount = 0;
 let selectedUnit = unitParam || 'all';
@@ -320,7 +320,7 @@ function checkAnswer() {
     document.getElementById('nextBtn').style.display='block';
   }
 
-  localStorage.setItem('progress', JSON.stringify(progress));
+  localStorage.setItem('progress_grade4', JSON.stringify(progress));
   updateScores();
 }
 

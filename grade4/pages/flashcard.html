@@ -125,7 +125,7 @@ const modeParam = params.get('mode'); // 'wrong' = 专练错题
 const data = window.ENGLISH_DATA || JSON.parse(localStorage.getItem('englishData') || 'null');
 if (!data) location.href = '../index.html';
 
-let progress = JSON.parse(localStorage.getItem('progress') || '{}');
+let progress = JSON.parse(localStorage.getItem('progress_grade4') || '{}');
 let queue = [];
 let current = 0;
 let rightCount = 0;
@@ -271,7 +271,7 @@ function markCard(correct) {
     if (dot) { dot.classList.add('seen', 'wrong'); }
   }
 
-  localStorage.setItem('progress', JSON.stringify(progress));
+  localStorage.setItem('progress_grade4', JSON.stringify(progress));
   current++;
   isFlipped = false;
   document.getElementById('flashcard').classList.remove('flipped');
