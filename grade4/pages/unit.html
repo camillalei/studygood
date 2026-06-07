@@ -312,7 +312,7 @@ function speakWord(word) {
     setTimeout(() => card.classList.remove('playing'), 1200);
   }
   const u = new SpeechSynthesisUtterance(word);
-  u.lang = 'en-US'; u.rate = 0.85;
+  u.lang = 'en-GB'; u.rate = 0.8;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
@@ -333,7 +333,7 @@ function readAll() {
     // 等当前词读完再读下一个（用 onend 回调）
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(words[i - 1]);
-    u.lang = 'en-US'; u.rate = 0.85;
+    u.lang = 'en-GB'; u.rate = 0.8;
     u.onend = () => { readAllTimer = setTimeout(next, 600); };
 
     // 高亮
@@ -384,7 +384,7 @@ function readAllSentences() {
     const text = row.querySelector('.sent-en')?.textContent.trim() || '';
     i++;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US'; u.rate = 0.85;
+    u.lang = 'en-GB'; u.rate = 0.8;
     u.onend = () => { readAllTimer = setTimeout(next, 600); };
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
@@ -409,7 +409,7 @@ function readAllDialogue() {
     const text = bubble.querySelector('.dlg-en')?.textContent.trim() || '';
     i++;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US'; u.rate = 0.85;
+    u.lang = 'en-GB'; u.rate = 0.8;
     u.onend = () => { readAllTimer = setTimeout(next, 700); };
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
@@ -434,7 +434,7 @@ function readAllChunks() {
     const text = tag.querySelector('.chunk-en')?.childNodes[0]?.textContent.trim() || '';
     i++;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US'; u.rate = 0.85;
+    u.lang = 'en-GB'; u.rate = 0.8;
     u.onend = () => { readAllTimer = setTimeout(next, 600); };
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
@@ -518,7 +518,7 @@ function readAllReading() {
     const text = para.textContent.trim();
     i++;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US'; u.rate = 0.85;
+    u.lang = 'en-GB'; u.rate = 0.8;
     u.onend = () => { readAllTimer = setTimeout(next, 700); };
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
@@ -544,8 +544,8 @@ const chunkList = document.getElementById('chunkList');
 function speak(text, e) {
   if (e) e.stopPropagation();
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'en-US';
-  utter.rate = 0.85;
+  utter.lang = 'en-GB';
+  utter.rate = 0.8;
   speechSynthesis.cancel();
   speechSynthesis.speak(utter);
 }

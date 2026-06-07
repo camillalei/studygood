@@ -211,7 +211,7 @@ function playWord() {
   const btn = document.getElementById('playBtn');
   btn.classList.add('speaking');
   const u = new SpeechSynthesisUtterance(v.word);
-  u.lang='en-US'; u.rate=0.75;
+  u.lang='en-GB'; u.rate=0.75;
   u.onend = () => btn.classList.remove('speaking');
   speechSynthesis.cancel();
   speechSynthesis.speak(u);

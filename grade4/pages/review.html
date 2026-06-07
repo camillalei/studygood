@@ -267,7 +267,7 @@ function confirmReset() {
 
 function speak(text) {
   const u = new SpeechSynthesisUtterance(text);
-  u.lang='en-US'; u.rate=0.85;
+  u.lang='en-GB'; u.rate=0.8;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }

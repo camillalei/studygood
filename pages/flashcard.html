@@ -282,7 +282,7 @@ function speakCurrent() {
   const word = queue[current]?.word;
   if (!word) return;
   const utter = new SpeechSynthesisUtterance(word);
-  utter.lang = 'en-US'; utter.rate = 0.85;
+  utter.lang = 'en-GB'; utter.rate = 0.8;
   speechSynthesis.cancel();
   speechSynthesis.speak(utter);
 }
