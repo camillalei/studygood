@@ -75,6 +75,7 @@
     }
     .key:active { background:#eee; transform:scale(0.9); }
     .key-del { width:52px; max-width:52px; background:#FF6B6B; color:white; font-size:18px; }
+    .key-special { width:44px; max-width:44px; background:#f5f5f5; color:#555; font-size:18px; font-weight:700; }
 
     .blanks-row { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
     .blank-letter {
@@ -133,13 +134,13 @@
 const ROWS = [
   ['q','w','e','r','t','y','u','i','o','p'],
   ['a','s','d','f','g','h','j','k','l'],
-  ['z','x','c','v','b','n','m','⌫']
+  ['z','x','c','v','b','n','m','-',"'",'⌫']
 ];
 ROWS.forEach((row, i) => {
   const rowEl = document.getElementById(`kr${i+1}`);
   row.forEach(k => {
     const btn = document.createElement('button');
-    btn.className = 'key' + (k==='⌫'?' key-del':'');
+    btn.className = 'key' + (k==='⌫'?' key-del':(k==='-'||k==="'")?' key-special':'');
     btn.textContent = k;
     btn.onclick = () => pressKey(k);
     rowEl.appendChild(btn);
@@ -313,6 +314,8 @@ function showComplete() {
 document.addEventListener('keydown', e => {
   if (e.key==='Backspace') pressKey('⌫');
   else if (e.key==='Enter' && answered) { current++; nextWord(); }
+  else if (e.key==='-') pressKey('-');
+  else if (e.key==="'") pressKey("'");
   else if (/^[a-zA-Z]$/.test(e.key)) pressKey(e.key.toLowerCase());
 });
 
