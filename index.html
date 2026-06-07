@@ -6,6 +6,11 @@
   <title>五年级英语上册</title>
   <link rel="stylesheet" href="assets/style.css">
   <script src="data/content.js"></script>
+  <script>
+    if (localStorage.getItem('loggedIn') !== 'true') {
+      location.replace('login.html');
+    }
+  </script>
 </head>
 <body>
 
